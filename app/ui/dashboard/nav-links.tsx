@@ -3,8 +3,14 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
+  PlusIcon,
+  RectangleGroupIcon,
+  ShoppingCartIcon,
+  ClipboardDocumentCheckIcon,
+  CurrencyRupeeIcon
+  
 } from '@heroicons/react/24/outline';
-
+import { useState } from'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
@@ -19,10 +25,46 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  {
+    name:'Suppliers',
+    href: '/dashboard/suppliers',
+    icon:ShoppingCartIcon,
+    
+  },
+  {
+    name:'Category',
+    href: '/dashboard/category',
+    icon:RectangleGroupIcon,
+    
+  },
+  {
+    name:'Products',
+    href: '/dashboard/products',
+    icon:PlusIcon,
+    
+  },
+  {
+    name:'Order',
+    href: '/dashboard/order',
+    icon:ClipboardDocumentCheckIcon,
+    
+  },
+  {
+    name:'Transaction',
+    href: '/dashboard/transaction',
+    icon:CurrencyRupeeIcon,
+    
+  },
 ];
 
 export default function NavLinks() {
   const pathname = usePathname();
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const toggleDropdown = (linkName:any) => {
+    setActiveDropdown(activeDropdown === linkName ? null : linkName);
+  };
+
   return (
     <>
       {links.map((link) => {
