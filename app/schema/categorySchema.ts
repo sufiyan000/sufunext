@@ -1,12 +1,9 @@
-// models/category.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 // Interface for Category Document
 export interface ICategory extends Document {
   name: string;
-  description?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  description: string;
 }
 
 // Category Schema
@@ -23,20 +20,13 @@ const CategorySchema: Schema = new Schema(
       type: String,
       default: "",
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );
 
-const Category = mongoose.model<ICategory>("Category", CategorySchema);
+// Check if the model already exists
+const Category = mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema);
 
 export default Category;

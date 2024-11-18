@@ -7,7 +7,7 @@ interface Category {
 }
 
 interface SubCategory {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   categoryId: string;
@@ -23,8 +23,8 @@ const SubCategoryPage: React.FC = () => {
 
   const [categories] = useState<Category[]>(dummyCategories);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([
-    { id: "1", name: "Mobiles", description: "Smartphones and accessories", categoryId: "1" },
-    { id: "2", name: "Clothing", description: "Men's and Women's Wear", categoryId: "2" },
+    { _id: "1", name: "Mobiles", description: "Smartphones and accessories", categoryId: "1" },
+    { _id: "2", name: "Clothing", description: "Men's and Women's Wear", categoryId: "2" },
   ]);
 
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ const SubCategoryPage: React.FC = () => {
     e.preventDefault();
 
     const newSubCategory: SubCategory = {
-      id: (subCategories.length + 1).toString(),
+      _id: (subCategories.length + 1).toString(),
       name: formData.name,
       description: formData.description,
       categoryId: formData.categoryId,
@@ -128,7 +128,7 @@ const SubCategoryPage: React.FC = () => {
           {subCategories.length > 0 ? (
             <ul className="space-y-4">
               {subCategories.map((subCategory) => (
-                <li key={subCategory.id} className="border-b pb-4">
+                <li key={subCategory._id} className="border-b pb-4">
                   <h3 className="text-lg font-medium">{subCategory.name}</h3>
                   <p className="text-sm text-gray-500">{subCategory.description}</p>
                   <p className="text-sm text-gray-500">

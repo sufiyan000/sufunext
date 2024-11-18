@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import axios from 'axios';
 import {
   CustomerField,
   CustomersTableType,
@@ -213,5 +214,16 @@ export async function fetchFilteredCustomers(query: string) {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
+  }
+}
+
+export async function fetchCategory() {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
+    return response.data.categories;
+    
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
   }
 }

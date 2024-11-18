@@ -1,28 +1,21 @@
 "use client"
 import React, { useState } from "react";
-
-interface SubCategory {
-  name: string;
-  description?: string;
-}
+import axios from 'axios';
 
 interface Category {
   name: string;
   description?: string;
-  subCategories: SubCategory[];
+  
 }
 
 const CategoryForm: React.FC = () => {
   const [category, setCategory] = useState<Category>({
     name: "",
     description: "",
-    subCategories: [],
+    
   });
 
-  const [newSubCategory, setNewSubCategory] = useState<SubCategory>({
-    name: "",
-    description: "",
-  });
+
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -31,31 +24,19 @@ const CategoryForm: React.FC = () => {
     setCategory((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubCategoryChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setNewSubCategory((prev) => ({ ...prev, [name]: value }));
-  };
 
-  const addSubCategory = () => {
-    if (newSubCategory.name.trim() === "") {
-      alert("Subcategory name is required.");
-      return;
-    }
-    setCategory((prev) => ({
-      ...prev,
-      subCategories: [...prev.subCategories, newSubCategory],
-    }));
-    setNewSubCategory({ name: "", description: "" });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Category Data:", category);
+  const data = {
+    name: category.name,
+    description: category.description,
+  }
+   
     alert("Category added successfully!");
+    const response = await axios.post('http://localhost:3000//api/category/create-category', data);
+    console.log(response);
     // Reset form
-    setCategory({ name: "", description: "", subCategories: [] });
+   
   };
 
   return (
@@ -96,10 +77,7 @@ const CategoryForm: React.FC = () => {
             placeholder="Enter category description (optional)"
           />
         </div>
-
-        {/* Add Subcategory */}
-        
-
+             
         {/* Submit Button */}
         <button
           type="submit"

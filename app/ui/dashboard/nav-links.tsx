@@ -44,14 +44,14 @@ const links = [
     
   },
   {
-    name:'Order',
-    href: '/dashboard/order',
+    name:'Orders',
+    href: '/dashboard/orders',
     icon:ClipboardDocumentCheckIcon,
     
   },
   {
-    name:'Transaction',
-    href: '/dashboard/transaction',
+    name:'Transactions',
+    href: '/dashboard/transactions',
     icon:CurrencyRupeeIcon,
     
   },
