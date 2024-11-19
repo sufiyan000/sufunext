@@ -6,6 +6,7 @@ import axios from 'axios';
 interface Category {
   _id: string;
   name: string;
+  description: string;
 }
 
 interface SubCategory {
@@ -30,7 +31,7 @@ export default function CategorySubcategoryManager() {
     // Fetch all categories on component mount
     const fetchCategories = async () => {
       const response = await axios.get('/api/category');
-      setCategories(response.data.categories || []); // Adjust based on API response
+      setCategories(response.data.categories); // Adjust based on API response
     };
     fetchCategories();
   }, []);
@@ -48,8 +49,6 @@ export default function CategorySubcategoryManager() {
 
   const handleCategoryChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategoryId(e.target.value);
-    const response = await axios.get(`/api/sub-category/${selectedCategoryId}`);
-        setSubcategories(response.data.subCategorys);
     setSubcategories([]); // Reset subcategories when category changes
    
     
@@ -129,10 +128,10 @@ export default function CategorySubcategoryManager() {
               <p className="text-gray-500">No subcategories available for this category.</p>
             ) : (
               <ul className="space-y-4">
-                {subcategories.map((subCategory) => (
+                {subcategories.map((subCategory,index) => (
                   <li key={subCategory._id} className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold">{subCategory.name}</h3>
+                      <h3 className="font-semibold">{(index+1)+" "+subCategory.name}</h3>
                       <p className="text-sm text-gray-500">{subCategory.description}</p>
                     </div>
                     <div className="flex space-x-2">

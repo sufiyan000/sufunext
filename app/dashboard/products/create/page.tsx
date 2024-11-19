@@ -1,3 +1,8 @@
+import CreateProduct from "@/app/ui/products/create-products";
 export default function Page() {
-    return <p>create Page</p>;
+    return (
+      <>
+        <CreateProduct />
+      </>
+    );
   }
