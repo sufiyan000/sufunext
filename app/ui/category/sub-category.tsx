@@ -1,8 +1,10 @@
-"use client"
-import React, { useState, ChangeEvent, FormEvent } from "react";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface Category {
-  id: string;
+  _id: string;
   name: string;
 }
 
@@ -13,138 +15,209 @@ interface SubCategory {
   categoryId: string;
 }
 
-const SubCategoryPage: React.FC = () => {
-  // Dummy data for categories and subcategories
-  const dummyCategories: Category[] = [
-    { id: "1", name: "Electronics" },
-    { id: "2", name: "Fashion" },
-    { id: "3", name: "Home & Kitchen" },
-  ];
-
-  const [categories] = useState<Category[]>(dummyCategories);
-  const [subCategories, setSubCategories] = useState<SubCategory[]>([
-    { _id: "1", name: "Mobiles", description: "Smartphones and accessories", categoryId: "1" },
-    { _id: "2", name: "Clothing", description: "Men's and Women's Wear", categoryId: "2" },
-  ]);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    categoryId: "",
+export default function CategorySubcategoryManager() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
+  const [formData, setFormData] = useState<Omit<SubCategory, '_id'>>({
+    name: '',
+    description: '',
+    categoryId: '',
   });
+  const [editingSubCategory, setEditingSubCategory] = useState<SubCategory | null>(null);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  useEffect(() => {
+    // Fetch all categories on component mount
+    const fetchCategories = async () => {
+      const response = await axios.get('/api/category');
+      setCategories(response.data.categories || []); // Adjust based on API response
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategoryId) {
+      // Fetch subcategories when a category is selected
+      const fetchSubCategories = async () => {
+        const response = await axios.get(`/api/sub-category/${selectedCategoryId}`);
+        setSubcategories(response.data.subCategorys);
+      };
+      fetchSubCategories();
+    }
+  }, [selectedCategoryId]);
+
+  const handleCategoryChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategoryId(e.target.value);
+    const response = await axios.get(`/api/sub-category/${selectedCategoryId}`);
+        setSubcategories(response.data.subCategorys);
+    setSubcategories([]); // Reset subcategories when category changes
+   
+    
   };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-    const newSubCategory: SubCategory = {
-      _id: (subCategories.length + 1).toString(),
-      name: formData.name,
-      description: formData.description,
-      categoryId: formData.categoryId,
-    };
+  const handleAddSubCategory = async () => {
+    const newSubCategory = { ...formData, categoryId: selectedCategoryId };
+    const response = await axios.post('/api/sub-category', newSubCategory);
+    setSubcategories([...subcategories, response.data]);
+    setFormData({ name: '', description: '', categoryId: '' });
+  };
 
-    setSubCategories((prev) => [...prev, newSubCategory]);
+  const handleEditSubCategory = (subCategory: SubCategory) => {
+    setEditingSubCategory(subCategory);
+    setFormData({
+      name: subCategory.name,
+      description: subCategory.description,
+      categoryId: subCategory.categoryId,
+    });
+  };
 
-    // Reset form data
-    setFormData({ name: "", description: "", categoryId: "" });
+  const handleUpdateSubCategory = async () => {
+    if (!editingSubCategory) return;
+    const updatedSubCategory = { ...editingSubCategory, ...formData };
+    const response = await axios.put(`/api/sub-category/${editingSubCategory._id}`, updatedSubCategory);
+    setSubcategories(
+      subcategories.map((sub) =>
+        sub._id === editingSubCategory._id ? response.data : sub
+      )
+    );
+    setEditingSubCategory(null);
+    setFormData({ name: '', description: '', categoryId: '' });
+  };
+
+  const handleDeleteSubCategory = async (subCategoryId: string) => {
+    await axios.delete(`/api/sub-category/${subCategoryId}`);
+    setSubcategories(subcategories.filter((sub) => sub._id !== subCategoryId));
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Manage Subcategories</h1>
+    <div className="p-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Category & Subcategory Management</h1>
 
-      {/* Subcategory Form */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Create Subcategory</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Subcategory Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
+      {/* Category Selector */}
+      <div className="mb-6">
+        <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+          Select Category
+        </label>
+        <select
+          id="category"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={selectedCategoryId}
+          onChange={handleCategoryChange}
+        >
+          <option value="" disabled>
+            -- Select a Category --
+          </option>
+          {categories.map((category) => (
+            <option key={category._id} value={category._id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Subcategories */}
+      {selectedCategoryId && (
+        <>
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold">Subcategories</h2>
+            {subcategories.length === 0 ? (
+              <p className="text-gray-500">No subcategories available for this category.</p>
+            ) : (
+              <ul className="space-y-4">
+                {subcategories.map((subCategory) => (
+                  <li key={subCategory._id} className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold">{subCategory.name}</h3>
+                      <p className="text-sm text-gray-500">{subCategory.description}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEditSubCategory(subCategory)}
+                        className="text-blue-500 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSubCategory(subCategory._id)}
+                        className="text-red-500 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <input
-              type="text"
-              name="description"
-              id="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
-              Category
-            </label>
-            <select
-              name="categoryId"
-              id="categoryId"
-              value={formData.categoryId}
-              onChange={handleInputChange}
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          {/* Add/Edit Subcategory Form */}
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-4">
+              {editingSubCategory ? 'Edit Subcategory' : 'Add Subcategory'}
+            </h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                editingSubCategory ? handleUpdateSubCategory() : handleAddSubCategory();
+              }}
             >
-              <option value="">Select Category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="mt-4">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                >
+                  {editingSubCategory ? 'Update Subcategory' : 'Add Subcategory'}
+                </button>
+                {editingSubCategory && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingSubCategory(null);
+                      setFormData({ name: '', description: '', categoryId: '' });
+                    }}
+                    className="ml-4 text-gray-600 underline"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
           </div>
-
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Create Subcategory
-          </button>
-        </form>
-      </div>
-
-      {/* Subcategory List */}
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Subcategory List</h2>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          {subCategories.length > 0 ? (
-            <ul className="space-y-4">
-              {subCategories.map((subCategory) => (
-                <li key={subCategory._id} className="border-b pb-4">
-                  <h3 className="text-lg font-medium">{subCategory.name}</h3>
-                  <p className="text-sm text-gray-500">{subCategory.description}</p>
-                  <p className="text-sm text-gray-500">
-                    Category:{" "}
-                    {categories.find((cat) => cat.id === subCategory.categoryId)?.name || "Unknown"}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">No subcategories available.</p>
-          )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
-};
-
-export default SubCategoryPage;
+}

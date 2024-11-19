@@ -5,8 +5,8 @@ export async function GET(request: Request,context:any) {
     await connectMongo();
      
     try{
-        const id = context.params.id;
-        const subCategorys = await subCategory.find({_id:id});
+        const id = context.params.categoryId;
+        const subCategorys = await subCategory.find({categoryId:id});
         return NextResponse.json({status: "success",statusCode:200,message:"Sub-Categories fetched successfully",subCategorys},{status:200});
     }
     catch(err: any) {
