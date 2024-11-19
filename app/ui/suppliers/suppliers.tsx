@@ -8,8 +8,10 @@ interface Supplier {
   email: string;
   phone: string;
   address: string;
+  telegram: string;
+  website: string;
 }
-
+import axios from 'axios';
 export default function SupplierManager() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [formData, setFormData] = useState<Omit<Supplier, '_id'>>({
@@ -17,6 +19,8 @@ export default function SupplierManager() {
     email: '',
     phone: '',
     address: '',
+    telegram: '',
+    website: '',
   });
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
 
@@ -25,13 +29,24 @@ export default function SupplierManager() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleAddSupplier = () => {
+  const handleAddSupplier = async () => {
+    const data = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      telegram: formData.telegram,
+      website: formData.website,
+
+    }
+      const response = await axios.post('http://localhost:3000/api/suppliers', data);
+      console.log(response);
     const newSupplier: Supplier = {
       ...formData,
       _id: `${Date.now()}`, // Generate a temporary ID for local state
     };
     setSuppliers([...suppliers, newSupplier]);
-    setFormData({ name: '', email: '', phone: '', address: '' });
+    setFormData({ name: '', email: '', phone: '', address: '', telegram: '', website: '',});
   };
 
   const handleEditSupplier = (supplier: Supplier) => {
@@ -41,6 +56,8 @@ export default function SupplierManager() {
       email: supplier.email,
       phone: supplier.phone,
       address: supplier.address,
+      telegram: supplier.telegram,
+      website: supplier.website,
     });
   };
 
@@ -52,7 +69,7 @@ export default function SupplierManager() {
     );
     setSuppliers(updatedSuppliers);
     setEditingSupplier(null);
-    setFormData({ name: '', email: '', phone: '', address: '' });
+    setFormData({ name: '', email: '', phone: '', address: '',telegram: '', website: ''});
   };
 
   const handleDeleteSupplier = (supplierId: string) => {
@@ -129,6 +146,34 @@ export default function SupplierManager() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
+            <div>
+              <label htmlFor="telegram" className="block text-sm font-medium text-gray-700">
+                telegram
+              </label>
+              <input
+                type="text"
+                id="telegram"
+                name="telegram"
+                value={formData.telegram}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+                Website
+              </label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
           </div>
           <div className="mt-4">
             <button
@@ -142,7 +187,7 @@ export default function SupplierManager() {
                 type="button"
                 onClick={() => {
                   setEditingSupplier(null);
-                  setFormData({ name: '', email: '', phone: '', address: '' });
+                  setFormData({ name: '', email: '', phone: '', address: '', telegram: '', website: ''});
                 }}
                 className="ml-4 text-gray-600 underline"
               >
