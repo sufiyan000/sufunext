@@ -30,7 +30,7 @@ export default function CategorySubcategoryManager() {
   useEffect(() => {
     // Fetch all categories on component mount
     const fetchCategories = async () => {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BASE_URL+'api/category');
+      const response = await axios.get(process.env.NEXT_PUBLIC_BASE_URL+'/api/category');
       setCategories(response.data.categories); // Adjust based on API response
     };
     fetchCategories();
