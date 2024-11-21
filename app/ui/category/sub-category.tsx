@@ -30,7 +30,7 @@ export default function CategorySubcategoryManager() {
   useEffect(() => {
     // Fetch all categories on component mount
     const fetchCategories = async () => {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BASE_URL+'/api/category');
+      const response = await axios.get('/api/category');
       setCategories(response.data.categories); // Adjust based on API response
     };
     fetchCategories();
@@ -40,7 +40,7 @@ export default function CategorySubcategoryManager() {
     if (selectedCategoryId) {
       // Fetch subcategories when a category is selected
       const fetchSubCategories = async () => {
-        const response = await axios.get(process.env.NEXT_PUBLIC_BASE_URL+`/api/sub-category/${selectedCategoryId}`);
+        const response = await axios.get(`/api/sub-category/${selectedCategoryId}`);
         setSubcategories(response.data.subCategorys);
       };
       fetchSubCategories();
@@ -61,7 +61,7 @@ export default function CategorySubcategoryManager() {
 
   const handleAddSubCategory = async () => {
     const newSubCategory = { ...formData, categoryId: selectedCategoryId };
-    const response = await axios.post(process.env.NEXT_PUBLIC_BASE_URL+'/api/sub-category', newSubCategory);
+    const response = await axios.post('/api/sub-category', newSubCategory);
     setSubcategories([...subcategories, response.data]);
     setFormData({ name: '', description: '', categoryId: '' });
   };
@@ -78,7 +78,7 @@ export default function CategorySubcategoryManager() {
   const handleUpdateSubCategory = async () => {
     if (!editingSubCategory) return;
     const updatedSubCategory = { ...editingSubCategory, ...formData };
-    const response = await axios.put(process.env.NEXT_PUBLIC_BASE_URL+`/api/sub-category/${editingSubCategory._id}`, updatedSubCategory);
+    const response = await axios.put(`/api/sub-category/${editingSubCategory._id}`, updatedSubCategory);
     setSubcategories(
       subcategories.map((sub) =>
         sub._id === editingSubCategory._id ? response.data : sub
