@@ -12,21 +12,14 @@ const AddProductForm = () => {
     price: '',
     discountedPrice: '',
     costPrice: '',
-    currency: 'INR',
     stockQuantity: '',
-    lowStockAlert: '',
-    stockStatus: 'Available',
     weight: '',
     dimensions: {
       length: '',
       width: '',
       height: ''
     },
-    shippingCost: '',
-    deliveryTime: '',
-    images: [],
-    videoUrl: '',
-    variants: [{ color: '', size: '', sku: '', stock: '' }],
+    variants: [{ color: '', size: '' }],
     warranty: '',
     returnPolicy: '',
     metaTitle: '',
@@ -66,20 +59,7 @@ const AddProductForm = () => {
     }));
   };
 
-  const addVariant = () => {
-    setProductData((prevData) => ({
-      ...prevData,
-      variants: [...prevData.variants, { color: '', size: '', sku: '', stock: '' }]
-    }));
-  };
-
-  const handleImageChange = (e:any) => {
-    setProductData((prevData:any) => ({
-      ...prevData,
-      images: [...prevData.images, ...e.target.files]
-    }));
-  };
-
+ 
   const handleSubmit = (e:any) => {
     e.preventDefault();
     console.log('Product Data:', productData);
@@ -108,22 +88,36 @@ const AddProductForm = () => {
       />
 
       <label className="block text-gray-700">Category:</label>
-      <input
-        type="text"
-        name="category"
-        value={productData.category}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
+       <select id="category" className="w-full mt-1 p-2 border border-gray-300 rounded-md" value={productData.category}>
+        <option value="">Select category</option>
+        <option value="electronics">Electronics</option>
+        <option value="fashion">Fashion</option>
+        <option value="beauty">Beauty</option>
+        </select>
+
+        <label className="block text-gray-700">Sub-Category:</label>
+       <select id="category" className="w-full mt-1 p-2 border border-gray-300 rounded-md" value={productData.category}>
+        <option value="">sub-category</option>
+        <option value="electronics">Electronics</option>
+        <option value="fashion">Fashion</option>
+        <option value="beauty">Beauty</option>
+        </select>
+
+        <label className="block text-gray-700">Sub-levels</label>
+       <select id="category" className="w-full mt-1 p-2 border border-gray-300 rounded-md" value={productData.category}>
+        <option value="">Sub-levels</option>
+        <option value="electronics">1</option>
+        <option value="fashion">2</option>
+        <option value="beauty">3</option>
+        </select>
 
      <label className="block text-gray-700">Suppliers:</label>
-      <input
-        type="supplier"
-        name="suppliers"
-        value={productData.brand}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
+     <select id="suppliers" className="w-full mt-1 p-2 border border-gray-300 rounded-md">
+        <option value="">Select suppliers</option>
+        <option value="electronics">supplier1</option>
+        <option value="fashion">supplier2</option>
+        <option value="beauty">supplier3</option>
+        </select>
 
       <label className="block text-gray-700">Brand:</label>
       <input
@@ -153,6 +147,24 @@ const AddProductForm = () => {
       />
 
       {/* Pricing Information */}
+      <label className="block text-gray-700">Sale Price:</label>
+      <input
+        type="number"
+        name="price"
+        value={productData.price}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+      />
+
+      <label className="block text-gray-700">Purchase Price:</label>
+      <input
+        type="number"
+        name="price"
+        value={productData.price}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+      />
+
       <label className="block text-gray-700">Price:</label>
       <input
         type="number"
@@ -241,32 +253,20 @@ const AddProductForm = () => {
             className="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
           />
 
-          <label className="block text-gray-700">SKU:</label>
-          <input
-            type="text"
-            name="sku"
-            value={variant.sku}
-            onChange={(e) => handleVariantChange(index, e)}
-            className="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
+           <label className="block text-gray-700">Additional Info:</label>
+          <textarea
+            name="description"
+            value={productData.description}
+            onChange={handleChange}
+            className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
           />
 
-          <label className="block text-gray-700">Stock:</label>
-          <input
-            type="number"
-            name="stock"
-            value={variant.stock}
-            onChange={(e) => handleVariantChange(index, e)}
-            className="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-          />
+          
+
+          
         </div>
       ))}
-      <button
-        type="button"
-        onClick={addVariant}
-        className="w-full py-2 mb-4 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none"
-      >
-        Add Another Variant
-      </button>
+      
 
       <button
         type="submit"
