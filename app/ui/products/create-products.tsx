@@ -1,281 +1,118 @@
-"use client"
-import React, { useState } from 'react';
-
-const AddProductForm = () => {
-  const [productData, setProductData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    brand: '',
-    sku: '',
-    tags: '',
-    price: '',
-    discountedPrice: '',
-    costPrice: '',
-    stockQuantity: '',
-    weight: '',
-    dimensions: {
-      length: '',
-      width: '',
-      height: ''
-    },
-    variants: [{ color: '', size: '' }],
-    warranty: '',
-    returnPolicy: '',
-    metaTitle: '',
-    metaDescription: '',
-    urlSlug: ''
-  });
-
-  const handleChange = (e:any) => {
-    const { name, value } = e.target;
-    setProductData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
+"use client";
+import { CategoryField, SubCategoryField } from '@/app/lib/definitions';
+import Link from 'next/link';
+import {
+  CheckIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
+import { Button } from '@/app/ui/button';
+import { creatProduct } from '@/app/lib/actions';
+import { fetchSubCategory} from '@/app/lib/data';
+import { useState } from 'react';
+export default function Form({ categories }: { categories: CategoryField[] }) {
+  const [ subCategory, setSubCategory ] = useState<SubCategoryField[]>([])
+  console.log(subCategory);
+  const [ subLevel, setSubLevel ] = useState('');
+  console.log(categories);
+  const handleCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    alert(event.target.value);
+   const subcat = await fetchSubCategory(event.target.value);
+   setSubCategory(subcat);
   };
-
-  const handleDimensionChange = (e:any) => {
-    const { name, value } = e.target;
-    setProductData((prevData) => ({
-      ...prevData,
-      dimensions: {
-        ...prevData.dimensions,
-        [name]: value
-      }
-    }));
-  };
-
-  const handleVariantChange = (index:any, e:any) => {
-    const { name, value } = e.target;
-    const updatedVariants = [...productData.variants];
-    updatedVariants[index] = {
-      ...updatedVariants[index],
-      [name]: value
-    };
-    setProductData((prevData) => ({
-      ...prevData,
-      variants: updatedVariants
-    }));
-  };
-
- 
-  const handleSubmit = (e:any) => {
-    e.preventDefault();
-    console.log('Product Data:', productData);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Add Product</h2>
-
-      {/* Product Details */}
-      <label className="block text-gray-700">Product Name:</label>
-      <input
-        type="text"
-        name="name"
-        value={productData.name}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Description:</label>
-      <textarea
-        name="description"
-        value={productData.description}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Category:</label>
-       <select id="category" className="w-full mt-1 p-2 border border-gray-300 rounded-md" value={productData.category}>
-        <option value="">Select category</option>
-        <option value="electronics">Electronics</option>
-        <option value="fashion">Fashion</option>
-        <option value="beauty">Beauty</option>
-        </select>
-
-        <label className="block text-gray-700">Sub-Category:</label>
-       <select id="category" className="w-full mt-1 p-2 border border-gray-300 rounded-md" value={productData.category}>
-        <option value="">sub-category</option>
-        <option value="electronics">Electronics</option>
-        <option value="fashion">Fashion</option>
-        <option value="beauty">Beauty</option>
-        </select>
-
-        <label className="block text-gray-700">Sub-levels</label>
-       <select id="category" className="w-full mt-1 p-2 border border-gray-300 rounded-md" value={productData.category}>
-        <option value="">Sub-levels</option>
-        <option value="electronics">1</option>
-        <option value="fashion">2</option>
-        <option value="beauty">3</option>
-        </select>
-
-     <label className="block text-gray-700">Suppliers:</label>
-     <select id="suppliers" className="w-full mt-1 p-2 border border-gray-300 rounded-md">
-        <option value="">Select suppliers</option>
-        <option value="electronics">supplier1</option>
-        <option value="fashion">supplier2</option>
-        <option value="beauty">supplier3</option>
-        </select>
-
-      <label className="block text-gray-700">Brand:</label>
-      <input
-        type="text"
-        name="brand"
-        value={productData.brand}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Warranty:</label>
-      <input
-        type="warranty"
-        name="warranty"
-        value={productData.warranty}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">SKU:</label>
-      <input
-        type="text"
-        name="sku"
-        value={productData.sku}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      {/* Pricing Information */}
-      <label className="block text-gray-700">Sale Price:</label>
-      <input
-        type="number"
-        name="price"
-        value={productData.price}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Purchase Price:</label>
-      <input
-        type="number"
-        name="price"
-        value={productData.price}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Price:</label>
-      <input
-        type="number"
-        name="price"
-        value={productData.price}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Discounted Price:</label>
-      <input
-        type="number"
-        name="discountedPrice"
-        value={productData.discountedPrice}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      {/* Inventory Details */}
-      <label className="block text-gray-700">Stock Quantity:</label>
-      <input
-        type="number"
-        name="stockQuantity"
-        value={productData.stockQuantity}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      {/* Shipping Information */}
-      <label className="block text-gray-700">Weight (kg):</label>
-      <input
-        type="number"
-        name="weight"
-        value={productData.weight}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-      />
-
-      <label className="block text-gray-700">Dimensions (L x W x H):</label>
-      <div className="flex space-x-2">
-        <input
-          type="number"
-          name="length"
-          value={productData.dimensions.length}
-          onChange={handleDimensionChange}
-          placeholder="Length"
-          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-        />
-        <input
-          type="number"
-          name="width"
-          value={productData.dimensions.width}
-          onChange={handleDimensionChange}
-          placeholder="Width"
-          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-        />
-        <input
-          type="number"
-          name="height"
-          value={productData.dimensions.height}
-          onChange={handleDimensionChange}
-          placeholder="Height"
-          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-        />
-      </div>
-
-      {/* Variants */}
-      <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-2">Product Variants</h3>
-      {productData.variants.map((variant, index) => (
-        <div key={index} className="mb-4 border p-4 rounded-lg">
-          <label className="block text-gray-700">Color:</label>
-          <input
-            type="text"
-            name="color"
-            value={variant.color}
-            onChange={(e) => handleVariantChange(index, e)}
-            className="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-          />
-
-          <label className="block text-gray-700">Size:</label>
-          <input
-            type="text"
-            name="size"
-            value={variant.size}
-            onChange={(e) => handleVariantChange(index, e)}
-            className="w-full p-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-          />
-
-           <label className="block text-gray-700">Additional Info:</label>
-          <textarea
-            name="description"
-            value={productData.description}
-            onChange={handleChange}
-            className="w-full p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500"
-          />
-
-          
-
-          
+    <form action={creatProduct}>
+      <div className="rounded-md bg-gray-50 p-4 md:p-6">
+        {/*  products title*/}
+        <div className="mb-4">
+          <label htmlFor="title" className="mb-2 block text-sm font-medium">
+            Name
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input
+                id="title"
+                name="title"
+                type="text"
+                placeholder="Enter Product Name"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+              />
+              <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
         </div>
-      ))}
-      
 
-      <button
-        type="submit"
-        className="w-full py-2 mt-4 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none"
-      >
-        Submit
-      </button>
+
+        {/* Invoice Amount */}
+        <div className="mb-4">
+          <label htmlFor="amount" className="mb-2 block text-sm font-medium">
+            Choose an amount
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input
+                id="amount"
+                name="amount"
+                type="text"
+                placeholder="Enter USD amount"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+              />
+              <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+        </div>
+
+        {/* Invoice Status */}
+        <fieldset>
+          <legend className="mb-2 block text-sm font-medium">
+            Set the invoice status
+          </legend>
+          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
+            <div className="flex gap-4">
+              <div className="flex items-center">
+                <input
+                  id="pending"
+                  name="status"
+                  type="radio"
+                  value="pending"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="pending"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
+                >
+                  Pending <ClockIcon className="h-4 w-4" />
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="paid"
+                  name="status"
+                  type="radio"
+                  value="paid"
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="paid"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                >
+                  Paid <CheckIcon className="h-4 w-4" />
+                </label>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div className="mt-6 flex justify-end gap-4">
+        <Link
+          href="/dashboard/products"
+          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
+        >
+          Cancel
+        </Link>
+        <Button type="submit">Create Products</Button>
+      </div>
     </form>
   );
-};
-
-export default AddProductForm;
+}

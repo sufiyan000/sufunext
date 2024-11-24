@@ -227,3 +227,14 @@ export async function fetchCategory() {
     return [];
   }
 }
+
+export async function fetchSubCategory(id:string) {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/sub-category/${id}`);
+    return response.data.categories;
+    
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}

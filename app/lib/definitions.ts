@@ -86,3 +86,14 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type CategoryField = {
+  _id: string;
+  name: string;
+};
+
+export type SubCategoryField = {
+  _id: string;
+  name: string;
+  description: string;
+};

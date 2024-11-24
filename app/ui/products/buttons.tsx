@@ -1,4 +1,4 @@
-import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, PlusIcon, TrashIcon,ViewfinderCircleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 export function CreateProduct() {
@@ -30,6 +30,17 @@ export function DeleteInvoice({ id }: { id: string }) {
       <button className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />
+      </button>
+    </>
+  );
+}
+
+export function ViewProduct({ id }: { id: string }) {
+  return (
+    <>
+      <button className="rounded-md border p-2 hover:bg-gray-100">
+        <span className="sr-only">view</span>
+        <ViewfinderCircleIcon className="w-5" />
       </button>
     </>
   );
