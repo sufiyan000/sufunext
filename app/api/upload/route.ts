@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const fileUrl = `https://drive.google.com/uc?id=${response.data.id}`;
+    const fileUrl = `https://drive.google.com/thumbnail?id=${response.data.id}&sz=w1000`;
+    console.log(response.data.id);
 
     return NextResponse.json({
       success: true,

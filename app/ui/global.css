@@ -16,3 +16,13 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.input-field {
+  @apply border p-2 rounded w-full;
+}
+.btn-add {
+  @apply bg-blue-500 text-white p-2 rounded;
+}
+.btn-submit {
+  @apply bg-green-500 text-white p-3 rounded w-full;
+}

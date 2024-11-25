@@ -1,118 +1,302 @@
 "use client";
-import { CategoryField, SubCategoryField } from '@/app/lib/definitions';
-import Link from 'next/link';
-import {
-  CheckIcon,
-  ClockIcon,
-  CurrencyDollarIcon,
-  UserCircleIcon,
-} from '@heroicons/react/24/outline';
-import { Button } from '@/app/ui/button';
-import { creatProduct } from '@/app/lib/actions';
-import { fetchSubCategory} from '@/app/lib/data';
-import { useState } from 'react';
-export default function Form({ categories }: { categories: CategoryField[] }) {
-  const [ subCategory, setSubCategory ] = useState<SubCategoryField[]>([])
-  console.log(subCategory);
-  const [ subLevel, setSubLevel ] = useState('');
-  console.log(categories);
-  const handleCategoryChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-    alert(event.target.value);
-   const subcat = await fetchSubCategory(event.target.value);
-   setSubCategory(subcat);
-  };
-  return (
-    <form action={creatProduct}>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/*  products title*/}
-        <div className="mb-4">
-          <label htmlFor="title" className="mb-2 block text-sm font-medium">
-            Name
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="title"
-                name="title"
-                type="text"
-                placeholder="Enter Product Name"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              />
-              <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-            </div>
-          </div>
-        </div>
+import React, { useState } from "react";
 
-
-        {/* Invoice Amount */}
-        <div className="mb-4">
-          <label htmlFor="amount" className="mb-2 block text-sm font-medium">
-            Choose an amount
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="amount"
-                name="amount"
-                type="text"
-                placeholder="Enter USD amount"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              />
-              <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
-            </div>
-          </div>
-        </div>
-
-        {/* Invoice Status */}
-        <fieldset>
-          <legend className="mb-2 block text-sm font-medium">
-            Set the invoice status
-          </legend>
-          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
-            <div className="flex gap-4">
-              <div className="flex items-center">
-                <input
-                  id="pending"
-                  name="status"
-                  type="radio"
-                  value="pending"
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                />
-                <label
-                  htmlFor="pending"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
-                >
-                  Pending <ClockIcon className="h-4 w-4" />
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id="paid"
-                  name="status"
-                  type="radio"
-                  value="paid"
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                />
-                <label
-                  htmlFor="paid"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  Paid <CheckIcon className="h-4 w-4" />
-                </label>
-              </div>
-            </div>
-          </div>
-        </fieldset>
-      </div>
-      <div className="mt-6 flex justify-end gap-4">
-        <Link
-          href="/dashboard/products"
-          className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
-        >
-          Cancel
-        </Link>
-        <Button type="submit">Create Products</Button>
-      </div>
-    </form>
-  );
+interface IAttribute {
+  key: string;
+  value: string | number | boolean;
 }
+
+const ProductForm: React.FC = () => {
+  const [product, setProduct] = useState({
+    name: "",
+    thumbnailUrl: "",
+    videoUrl: "",
+    brand: "",
+    warranty: "",
+    description: "",
+    suppliers: "",
+    category: "",
+    purchasePrice: "",
+    price: "",
+    regularPrice: "",
+    stock: "",
+    categories: [""],
+    subCategories: [""],
+    subLevels: [""],
+    attributes: [{ key: "", value: "" }] as IAttribute[],
+    isFeatured: false,
+    images: [""],
+  });
+
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+    }
+  };
+
+  const uploadThumbnail = async () => {
+    if (!thumbnailFile) return;
+
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", thumbnailFile);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setProduct({ ...product, thumbnailUrl: data.fileUrl });
+        alert("Image uploaded successfully!");
+      } else {
+        alert(data.error || "Failed to upload image.");
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("An error occurred while uploading the image.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setProduct({ ...product, [name]: value });
+  };
+
+  const handleAttributeChange = (
+    index: number,
+    field: "key" | "value",
+    value: string | number | boolean
+  ) => {
+    const updatedAttributes = [...product.attributes];
+    updatedAttributes[index] = {
+      ...updatedAttributes[index],
+      [field]: value,
+    };
+    setProduct({ ...product, attributes: updatedAttributes });
+  };
+  
+
+  const addAttribute = () => {
+    setProduct({ ...product, attributes: [...product.attributes, { key: "", value: "" }] });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Submitting Product:", product);
+    // Add logic to send data to your API
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+      <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
+      <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Thumbnail Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="mb-4 mt-1 block w-full text-sm text-gray-900 bg-gray-50 rounded border border-gray-300"
+            />
+            {thumbnailFile && (
+              <button
+                type="button"
+                onClick={uploadThumbnail}
+                disabled={isUploading}
+                className={`mt-2 px-4 py-2 rounded ${
+                  isUploading ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"
+                }`}
+              >
+                {isUploading ? "Uploading..." : "Upload Image"}
+              </button>
+            )}
+            {product.thumbnailUrl && (
+              <div className="mt-4">
+                <p className="text-sm text-green-500">Uploaded Image:</p>
+                <img
+                  src={product.thumbnailUrl}
+                  alt="Thumbnail"
+                  className="mt-2 w-32 h-32 rounded"
+                />
+              </div>
+            )}
+          </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Product Name"
+            value={product.name}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+          <input
+            type="text"
+            name="thumbnailUrl"
+            placeholder="Thumbnail URL"
+            value={product.thumbnailUrl}
+            onChange={handleChange}
+            className="input-field"
+          />
+          <input
+            type="text"
+            name="videoUrl"
+            placeholder="Video URL"
+            value={product.videoUrl}
+            onChange={handleChange}
+            className="input-field"
+          />
+          <input
+            type="text"
+            name="brand"
+            placeholder="Brand"
+            value={product.brand}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+          <input
+            type="text"
+            name="warranty"
+            placeholder="Warranty"
+            value={product.warranty}
+            onChange={handleChange}
+            className="input-field"
+          />
+          <textarea
+            name="description"
+            placeholder="Product Description"
+            value={product.description}
+            onChange={handleChange}
+            className="input-field h-24"
+          ></textarea>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+         <select
+            name="suppliers"
+            value={product.suppliers}
+            onChange={handleChange}
+            className="input-field"
+            required
+          >
+            <option value="" disabled>
+              Select a Supplier
+            </option>
+            <option value="Supplier1">Supplier 1</option>
+            <option value="Supplier2">Supplier 2</option>
+            <option value="Supplier3">Supplier 3</option>
+          </select>
+
+          <select
+            name="category"
+            value={product.category}
+            onChange={handleChange}
+            className="input-field"
+            required
+          >
+            <option value="" disabled>
+              Select a Supplier
+            </option>
+            <option value="Supplier1">Supplier 1</option>
+            <option value="Supplier2">Supplier 2</option>
+            <option value="Supplier3">Supplier 3</option>
+          </select>
+
+          <input
+            type="number"
+            name="purchasePrice"
+            placeholder="Purchase Price"
+            value={product.purchasePrice}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+          <input
+            type="number"
+            name="price"
+            placeholder="Selling Price"
+            value={product.price}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+          <input
+            type="number"
+            name="regularPrice"
+            placeholder="Regular Price"
+            value={product.regularPrice}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+          <input
+            type="number"
+            name="stock"
+            placeholder="Stock Quantity"
+            value={product.stock}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Attributes</h3>
+          {product.attributes.map((attr, index) => (
+            <div key={index} className="flex gap-4 mb-2">
+              <input
+                type="text"
+                placeholder="Key"
+                value={attr.key}
+                onChange={(e) => handleAttributeChange(index, "key", e.target.value)}
+                className="input-field"
+              />
+              <input
+                type="text"
+                placeholder="Value"
+                value={attr.value as string}
+                onChange={(e) => handleAttributeChange(index, "value", e.target.value)}
+                className="input-field"
+              />
+            </div>
+          ))}
+          <button type="button" onClick={addAttribute} className="btn-add">
+            Add Attribute
+          </button>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              name="isFeatured"
+              checked={product.isFeatured}
+              onChange={(e) => setProduct({ ...product, isFeatured: e.target.checked })}
+              className="mr-2"
+            />
+            Featured Product
+          </label>
+        </div>
+
+        <button type="submit" className="btn-submit">
+          Submit Product
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default ProductForm;

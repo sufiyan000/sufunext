@@ -9,6 +9,7 @@ interface IAttribute {
 export interface IProduct extends Document {
     name: string;
     thumbnailUrl: string;
+    videoUrl: string;
     brand: string;
     warranty: string;
     description?: string;
@@ -30,7 +31,8 @@ export interface IProduct extends Document {
 // Define the schema for the Product model
 const productSchema = new Schema<IProduct>({
     name: { type: String, required: true },
-    thumbnailUrl: { type: String, required: true},
+    thumbnailUrl: { type: String},
+    videoUrl: {type: String},
     brand: { type: String, required: true},
     warranty: { type: String},
     description: { type: String },
@@ -56,9 +58,10 @@ const productSchema = new Schema<IProduct>({
     ],
     isFeatured: { type: Boolean, default: false },
     images: [{ type: String }],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-});
+    
+}, {
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+  });
 
 // Define and export the Product model
 const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);
