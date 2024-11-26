@@ -45,6 +45,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
     thumbnailUrl: "",
     videoUrl: "",
     brand: "",
+    sku: "",
     warranty: "",
     description: "",
     suppliers: "",
@@ -253,7 +254,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
           mode="multiple"
           allowClear
           style={{ width: '100%' }}
-          placeholder="Select categories"
+          placeholder="Select Categories"
           onChange={(value) => handledChange(value, 'categories')}
           options={category}
         />
@@ -262,7 +263,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
           mode="multiple"
           allowClear
           style={{ width: '100%' }}
-          placeholder="Select categories"
+          placeholder="Select Sub-Categories"
           onChange={(value) => handledChange(value, 'subCategories')}
           options={subCategories}
         />
@@ -270,7 +271,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
           mode="multiple"
           allowClear
           style={{ width: '100%' }}
-          placeholder="Select sub-Levels"
+          placeholder="Select Sub-Levels"
           onChange={(value) => handledChange(value, 'subLevels')}
           options={subCategories}
         />
@@ -309,6 +310,16 @@ const category: SelectProps['options'] = categories.map((cat) => ({
             name="stock"
             placeholder="Stock Quantity"
             value={product.stock}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+
+          <input
+            type="text"
+            name="sku"
+            placeholder="SKU"
+            value={product.sku}
             onChange={handleChange}
             className="input-field"
             required

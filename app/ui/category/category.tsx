@@ -1,93 +1,94 @@
-"use client"
-import React, { useState } from "react";
-import axios from 'axios';
+"use client";
+import React, { useState, useEffect } from 'react';
+import { Table, Modal, Form, Input,  Popconfirm, message } from 'antd';
 
+import axios from 'axios';
+import Link from 'next/link';
 interface Category {
+  _id: string;
   name: string;
-  description?: string;
-  
+  description: string;
 }
 
-const CategoryForm: React.FC = () => {
-  const [category, setCategory] = useState<Category>({
-    name: "",
-    description: "",
-    
-  });
+const AddCategoryForm: React.FC = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
 
 
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/api/category');
+        setCategories(response.data.categories); // Adjust based on your API response
+      } catch (error) {
+        message.error('Failed to fetch categories');
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setCategory((prev) => ({ ...prev, [name]: value }));
+ 
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      await axios.delete(`/api/category/${categoryId}`);
+      setCategories(categories.filter((cat) => cat._id !== categoryId));
+      message.success('Category deleted successfully');
+    } catch (error) {
+      message.error('Failed to delete category');
+    }
   };
 
+  
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  const data = {
-    name: category.name,
-    description: category.description,
-  }
-   
-    alert("Category added successfully!");
-    const response = await axios.post('http://localhost:3000/api/category/create-category', data);
-    console.log(response);
-    // Reset form
-   
-  };
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: Category) => (
+        <div className="flex space-x-2">
+          <button>
+            Edit
+          </button>
+          <Popconfirm
+            title="Are you sure to delete this category?"
+            onConfirm={() => handleDeleteCategory(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <button>
+              Delete
+            </button>
+          </Popconfirm>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow rounded-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Add Category</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Category Name */}
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 font-medium">
-            Category Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={category.name}
-            onChange={handleInputChange}
-            className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-teal-400"
-            placeholder="Enter category name"
-            required
-          />
-        </div>
+    <div className="p-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Category Management</h1>
+      <Link href={"/dashboard/category/add"}>Add Category</Link>
 
-        {/* Category Description */}
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-gray-700 font-medium"
-          >
-            Category Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={category.description}
-            onChange={handleInputChange}
-            className="w-full mt-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-teal-400"
-            placeholder="Enter category description (optional)"
-          />
-        </div>
-             
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 font-medium"
-        >
-          Save Category
-        </button>
-      </form>
+      {/* Category List Table */}
+      <Table
+        dataSource={categories}
+        columns={columns}
+        rowKey={(record) => record._id}
+      />
+
+    
     </div>
   );
 };
 
-export default CategoryForm;
+export default AddCategoryForm;

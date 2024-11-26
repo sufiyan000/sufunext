@@ -11,6 +11,7 @@ export interface IProduct extends Document {
     thumbnailUrl: string;
     videoUrl: string;
     brand: string;
+    sku: string;
     warranty: string;
     description?: string;
     suppliers: string;
@@ -34,6 +35,7 @@ const productSchema = new Schema<IProduct>({
     thumbnailUrl: { type: String},
     videoUrl: {type: String},
     brand: { type: String, required: true},
+    sku: { type: String, required: true},
     warranty: { type: String},
     description: { type: String },
     suppliers: { type: String, required: true},
@@ -48,7 +50,7 @@ const productSchema = new Schema<IProduct>({
         { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory'},
     ],
     subLevels: [
-        { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubCategory' },
+        { type: mongoose.Schema.Types.ObjectId, ref: 'SubLevel' },
     ],
     attributes: [
         {
