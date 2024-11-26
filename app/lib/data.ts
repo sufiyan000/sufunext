@@ -217,6 +217,17 @@ export async function fetchFilteredCustomers(query: string) {
   }
 }
 
+export async function fetchSuppliers() {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/suppliers`);
+    console.log(response);
+    return response.data.supplier;
+    
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
 export async function fetchCategory() {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);

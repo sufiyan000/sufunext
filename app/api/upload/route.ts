@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         type: 'anyone',
       },
     });
-
+   // https://drive.google.com/thumbnail?id=0B6wwyazyzml-OGQ3VUo0Z2thdmc&sz=w1000
     const fileUrl = `https://drive.google.com/thumbnail?id=${response.data.id}&sz=w1000`;
     console.log(response.data.id);
 

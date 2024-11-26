@@ -15,7 +15,7 @@ export interface IProduct extends Document {
     description?: string;
     suppliers: string;
     purchasePrice: number;
-    price: number;
+    sellingPrice: number;
     regularPrice: number;
     stock: number;
     categories?: mongoose.Types.ObjectId[]; // Array of category IDs
@@ -38,7 +38,7 @@ const productSchema = new Schema<IProduct>({
     description: { type: String },
     suppliers: { type: String, required: true},
     purchasePrice: { type: Number, required: true },
-    price: { type: Number, required: true },
+    sellingPrice: { type: Number, required: true },
     regularPrice: { type: Number, required: true},
     stock: { type: Number, required: true },
     categories: [

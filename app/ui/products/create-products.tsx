@@ -1,12 +1,45 @@
 "use client";
 import React, { useState } from "react";
-
+import { Select } from 'antd';
+import axios from 'axios';
+import type { SelectProps } from 'antd';
 interface IAttribute {
   key: string;
   value: string | number | boolean;
 }
+import Image from "next/image";
+interface Category {
+  _id: string;
+  name: string;
+  description: string;
+}
 
-const ProductForm: React.FC = () => {
+interface Supplier {
+  _id: string;
+  name: string;
+}
+
+interface CreateProductProps {
+  categories: Category[];
+  suppliers: Supplier[];
+}
+const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) => {
+  // Map `category` to Ant Design `options`
+const category: SelectProps['options'] = categories.map((cat) => ({
+  label: cat.name, // The label shown in the dropdown
+  value: cat._id.toString(), // The value of the selected option
+}));
+  // Map `subCategory` to Ant Design `options`
+  const subCategories: SelectProps['options'] = categories.map((cat) => ({
+    label: cat.name, // The label shown in the dropdown
+    value: cat._id.toString(), // The value of the selected option
+  }));
+
+   // Map `subLevels` to Ant Design `options`
+   const subLevels: SelectProps['options'] = categories.map((cat) => ({
+    label: cat.name, // The label shown in the dropdown
+    value: cat._id.toString(), // The value of the selected option
+  }));
   const [product, setProduct] = useState({
     name: "",
     thumbnailUrl: "",
@@ -15,7 +48,6 @@ const ProductForm: React.FC = () => {
     warranty: "",
     description: "",
     suppliers: "",
-    category: "",
     purchasePrice: "",
     price: "",
     regularPrice: "",
@@ -71,6 +103,15 @@ const ProductForm: React.FC = () => {
     setProduct({ ...product, [name]: value });
   };
 
+  const handledChange = (value: string[], fieldName: keyof typeof product) => {
+    console.log(`Selected ${fieldName}:`, value);
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [fieldName]: value, // Dynamically update the field using the fieldName
+    }));
+  };
+  
+
   const handleAttributeChange = (
     index: number,
     field: "key" | "value",
@@ -89,10 +130,12 @@ const ProductForm: React.FC = () => {
     setProduct({ ...product, attributes: [...product.attributes, { key: "", value: "" }] });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitting Product:", product);
     // Add logic to send data to your API
+    const response = await axios.post('http://localhost:3000/api/products', product);
+    console.log(response.data);
   };
 
   return (
@@ -123,10 +166,12 @@ const ProductForm: React.FC = () => {
             {product.thumbnailUrl && (
               <div className="mt-4">
                 <p className="text-sm text-green-500">Uploaded Image:</p>
-                <img
+                <Image
                   src={product.thumbnailUrl}
                   alt="Thumbnail"
                   className="mt-2 w-32 h-32 rounded"
+                  width={100}
+                  height={100}
                 />
               </div>
             )}
@@ -195,25 +240,42 @@ const ProductForm: React.FC = () => {
             <option value="" disabled>
               Select a Supplier
             </option>
-            <option value="Supplier1">Supplier 1</option>
-            <option value="Supplier2">Supplier 2</option>
-            <option value="Supplier3">Supplier 3</option>
+            {
+              suppliers.map((supplier) => (
+                <option key={supplier._id} value={supplier._id}>
+                  {supplier.name}
+                </option>
+              ))
+            }
           </select>
 
-          <select
-            name="category"
-            value={product.category}
-            onChange={handleChange}
-            className="input-field"
-            required
-          >
-            <option value="" disabled>
-              Select a Supplier
-            </option>
-            <option value="Supplier1">Supplier 1</option>
-            <option value="Supplier2">Supplier 2</option>
-            <option value="Supplier3">Supplier 3</option>
-          </select>
+          <Select
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder="Select categories"
+          onChange={(value) => handledChange(value, 'categories')}
+          options={category}
+        />
+
+        <Select
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder="Select categories"
+          onChange={(value) => handledChange(value, 'subCategories')}
+          options={subCategories}
+        />
+         <Select
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder="Select sub-Levels"
+          onChange={(value) => handledChange(value, 'subLevels')}
+          options={subCategories}
+        />
+
+       
 
           <input
             type="number"

@@ -5,9 +5,8 @@ import Supplier from "@/app/schema/supplierSchema";
 
 export async function GET(request: Request) {
     await connectMongo();
-    const data = await request.json();
     try{
-        const supplier = await Supplier.find({});
+        const supplier = await Supplier.find({}, 'name  _id');
         return NextResponse.json({status: "success",statusCode:200,message:"Supplier fetch successfully",supplier},{status:200});
     }
     catch(err: any) {
