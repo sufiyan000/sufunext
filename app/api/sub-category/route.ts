@@ -6,9 +6,9 @@ export async function POST(request: Request) {
     const data = await request.json();
   
     try{
-        const subCat = new SubCategory(data);
-        await subCat.save();
-        return NextResponse.json({status: "success",statusCode:200,message:"Sub-Category added successfully",subCat},{status:200});
+        const subCategories = new SubCategory(data);
+        await subCategories.save();
+        return NextResponse.json({status: "success",statusCode:200,message:"Sub-Category added successfully",subCategories},{status:200});
     }
     catch(err: any) {
         return NextResponse.json({status: "error", statusCode: 400, message: err.message}, {status: 400});

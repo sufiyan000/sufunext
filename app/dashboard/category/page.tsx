@@ -4,7 +4,6 @@ import { fetchCategory} from "@/app/lib/data";
 
 export default async function Page() {
   const categories = await fetchCategory();
-   console.log(categories);
     
     return (
         <>

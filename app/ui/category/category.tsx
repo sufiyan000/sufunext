@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Table, Modal, Form, Input,  Popconfirm, message } from 'antd';
+import { Button } from '../button';
 
 import axios from 'axios';
 import Link from 'next/link';
@@ -77,7 +78,10 @@ const AddCategoryForm: React.FC = () => {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Category Management</h1>
-      <Link href={"/dashboard/category/add"}>Add Category</Link>
+      <div className="flex gap-2">
+      <Button><Link href={"/dashboard/category/add"}>Add Category</Link></Button>
+      <Button><Link href={"/dashboard/category/sub-category"}>Sub-Category</Link></Button>
+      </div>
 
       {/* Category List Table */}
       <Table
