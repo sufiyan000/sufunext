@@ -6,6 +6,9 @@ export async function GET(request: Request,context:any) {
      
     try{
         const id = context.params.categoryId;
+        if(!id){
+            return NextResponse.json({success:false,message: "Category Id is required"});
+        }
         const subCategorys = await subCategory.find({categoryId:id});
         return NextResponse.json({status: "success",statusCode:200,message:"Sub-Categories fetched successfully",subCategorys},{status:200});
     }

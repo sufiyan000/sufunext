@@ -1,8 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Select } from 'antd';
 import axios from 'axios';
-import type { SelectProps } from 'antd';
 interface IAttribute {
   key: string;
   value: string | number | boolean;
@@ -24,22 +22,6 @@ interface CreateProductProps {
   suppliers: Supplier[];
 }
 const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) => {
-  // Map `category` to Ant Design `options`
-const category: SelectProps['options'] = categories.map((cat) => ({
-  label: cat.name, // The label shown in the dropdown
-  value: cat._id.toString(), // The value of the selected option
-}));
-  // Map `subCategory` to Ant Design `options`
-  const subCategories: SelectProps['options'] = categories.map((cat) => ({
-    label: cat.name, // The label shown in the dropdown
-    value: cat._id.toString(), // The value of the selected option
-  }));
-
-   // Map `subLevels` to Ant Design `options`
-   const subLevels: SelectProps['options'] = categories.map((cat) => ({
-    label: cat.name, // The label shown in the dropdown
-    value: cat._id.toString(), // The value of the selected option
-  }));
   const [product, setProduct] = useState({
     name: "",
     thumbnailUrl: "",
@@ -50,7 +32,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
     description: "",
     suppliers: "",
     purchasePrice: "",
-    price: "",
+    sellingPrice: "",
     regularPrice: "",
     stock: "",
     categories: [""],
@@ -99,19 +81,25 @@ const category: SelectProps['options'] = categories.map((cat) => ({
       setIsUploading(false);
     }
   };
+ 
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
-  };
-
-  const handledChange = (value: string[], fieldName: keyof typeof product) => {
-    console.log(`Selected ${fieldName}:`, value);
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [fieldName]: value, // Dynamically update the field using the fieldName
-    }));
+  
+    setProduct((prevProduct) => {
+      // Check if the field is supposed to be an array
+      const isArrayField = ["categories", "subCategories", "subLevels"].includes(name);
+  
+      return {
+        ...prevProduct,
+        [name]: isArrayField ? [value] : value, // Wrap in an array only for array fields
+      };
+    });
+    console.log("Product", product);
   };
   
+
+ 
 
   const handleAttributeChange = (
     index: number,
@@ -250,31 +238,61 @@ const category: SelectProps['options'] = categories.map((cat) => ({
             }
           </select>
 
-          <Select
-          mode="multiple"
-          allowClear
-          style={{ width: '100%' }}
-          placeholder="Select Categories"
-          onChange={(value) => handledChange(value, 'categories')}
-          options={category}
-        />
+          <select
+            name="categories"
+            value={product.categories[0] || ""}
+            onChange={handleChange}
+            className="input-field"
+            required
+          >
+            <option value="" disabled>
+              Select a Category
+            </option>
+            {
+              categories.map((supplier) => (
+                <option key={supplier._id} value={supplier._id}>
+                  {supplier.name}
+                </option>
+              ))
+            }
+          </select>
 
-        <Select
-          mode="multiple"
-          allowClear
-          style={{ width: '100%' }}
-          placeholder="Select Sub-Categories"
-          onChange={(value) => handledChange(value, 'subCategories')}
-          options={subCategories}
-        />
-         <Select
-          mode="multiple"
-          allowClear
-          style={{ width: '100%' }}
-          placeholder="Select Sub-Levels"
-          onChange={(value) => handledChange(value, 'subLevels')}
-          options={subCategories}
-        />
+          <select
+            name="subCategories"
+            value={product.subCategories[0] || ""}
+            onChange={handleChange}
+            className="input-field"
+            required
+          >
+            <option value="" disabled>
+              Select a subCategories
+            </option>
+            {
+              categories.map((supplier) => (
+                <option key={supplier._id} value={supplier._id}>
+                  {supplier.name}
+                </option>
+              ))
+            }
+          </select>
+          <select
+            name="subLevels"
+            value={product.subLevels[0] || ""}
+            onChange={handleChange}
+            className="input-field"
+            required
+          >
+            <option value="" disabled>
+              Select a subLevels
+            </option>
+            {
+              categories.map((supplier) => (
+                <option key={supplier._id} value={supplier._id}>
+                  {supplier.name}
+                </option>
+              ))
+            }
+          </select>
 
        
 
@@ -284,15 +302,17 @@ const category: SelectProps['options'] = categories.map((cat) => ({
             placeholder="Purchase Price"
             value={product.purchasePrice}
             onChange={handleChange}
+            onWheel={(e) => e.currentTarget.blur()}
             className="input-field"
             required
           />
           <input
             type="number"
-            name="price"
+            name="sellingPrice"
             placeholder="Selling Price"
-            value={product.price}
+            value={product.sellingPrice}
             onChange={handleChange}
+            onWheel={(e) => e.currentTarget.blur()}
             className="input-field"
             required
           />
@@ -302,6 +322,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
             placeholder="Regular Price"
             value={product.regularPrice}
             onChange={handleChange}
+            onWheel={(e) => e.currentTarget.blur()}
             className="input-field"
             required
           />
@@ -311,6 +332,7 @@ const category: SelectProps['options'] = categories.map((cat) => ({
             placeholder="Stock Quantity"
             value={product.stock}
             onChange={handleChange}
+            onWheel={(e) => e.currentTarget.blur()}
             className="input-field"
             required
           />
