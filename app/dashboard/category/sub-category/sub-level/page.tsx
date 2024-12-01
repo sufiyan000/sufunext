@@ -39,17 +39,16 @@ export default async function Page() {
        <main>
          <Breadcrumbs
               breadcrumbs={[
-                { label: 'Category', href: '/dashboard/category' },
+                { label: 'Sub-Category', href: '/dashboard/category/sub-category' },
                 {
-                  label: 'Sub-Category',
-                  href: '/dashboard/category/sub-category',
+                  label: 'Sub-Level',
+                  href: '/dashboard/category/sub-category/sub-level',
                   active: true,
                 },  
               ]}
             />
             <div className="flex gap-3">
-              <Button><Link href={"/dashboard/category/sub-category/add"}>Add Sub-category</Link></Button>
-              <Button><Link href={"/dashboard/category/sub-category/sub-level"}>Sub-Level</Link></Button>
+              <Button><Link href={"/dashboard/category/sub-category/sub-level/add"}>Add Sub-Level</Link></Button>
             </div>
         <Table dataSource={dataSource} columns={columns} />;
 
