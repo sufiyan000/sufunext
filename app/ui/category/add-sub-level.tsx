@@ -15,7 +15,6 @@ interface AddSubCategoryFormProps {
   category: Category[]; // Array of category objects
 }
 const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
-  console.log(category);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [subCategory, setSubCategory] = useState<SubCategory[]>([]); // List of sub-categories
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");

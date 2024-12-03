@@ -23,6 +23,7 @@ export interface IProduct extends Document {
     subCategories?: mongoose.Types.ObjectId[]; // Array of sub-category IDs
     subLevels?: mongoose.Types.ObjectId[]; // Array of sub-level IDs (optional)
     attributes?: IAttribute[];
+    tags?: string[];
     isFeatured?: boolean; // To highlight a product
     images?: string[]; // Array of image URLs
     createdAt: Date;
@@ -58,6 +59,7 @@ const productSchema = new Schema<IProduct>({
             value: { type: Schema.Types.Mixed }, // Flexible value type
         },
     ],
+    tags: [String],
     isFeatured: { type: Boolean, default: false },
     images: [{ type: String }],
     

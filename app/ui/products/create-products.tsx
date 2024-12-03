@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import axios from 'axios';
+import {  message } from 'antd';
 interface IAttribute {
   key: string;
   value: string | number | boolean;
@@ -17,11 +18,56 @@ interface Supplier {
   name: string;
 }
 
+interface SubCategory {
+  _id: string;
+  name: string;
+}
+
+interface SubLevel {
+  _id: string;
+  name: string;
+}
+
 interface CreateProductProps {
   categories: Category[];
   suppliers: Supplier[];
 }
 const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const success = (message: string) => {
+    messageApi.open({
+      type: 'success',
+      content: message,
+    });
+  };
+
+  const error = () => {
+    messageApi.open({
+      type: 'error',
+      content: 'This is an error message',
+    });
+  };
+  const initialProductState = {
+    name: "",
+    thumbnailUrl: "",
+    videoUrl: "",
+    brand: "",
+    sku: "",
+    warranty: "",
+    description: "",
+    suppliers: "",
+    purchasePrice: "",
+    sellingPrice: "",
+    regularPrice: "",
+    stock: "",
+    categories: [""],
+    subCategories: [""],
+    subLevels: [""],
+    attributes: [{ key: "", value: "" }],
+    tags: [],
+    isFeatured: false,
+    images: [""],
+  };
   const [product, setProduct] = useState({
     name: "",
     thumbnailUrl: "",
@@ -39,12 +85,16 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
     subCategories: [""],
     subLevels: [""],
     attributes: [{ key: "", value: "" }] as IAttribute[],
+    tags: [] as string[],
     isFeatured: false,
     images: [""],
   });
 
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const [ subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [ subLevels, setSubLevels] = useState<SubLevel[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,6 +135,20 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name === "categories") {
+      setSubCategories([]);
+      setSubLevels([]);
+      fetchSubCategories(value);
+       // Reset sub-category when category changes
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      subCategories: [""],
+    }));
+    }
+    if (name === "subCategories") {
+      setSubLevels([]);
+      fetchSubLevel(value);
+    }
   
     setProduct((prevProduct) => {
       // Check if the field is supposed to be an array
@@ -97,6 +161,26 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
     });
     console.log("Product", product);
   };
+
+  const fetchSubCategories = async (id:string) =>{
+        try {
+          const response = await axios.get(`/api/sub-category/${id}`);
+          setSubCategories(response.data.subCategorys);
+        } catch (error) {
+          console.error("Error fetching sub-categories:", error);
+        }
+      
+  }
+  
+  const fetchSubLevel = async (id:string) =>{
+    try {
+      const response = await axios.get(`/api/sub-levels/${id}`);
+      setSubLevels(response.data.subLevels);
+      
+    } catch (error) {
+      console.error("Error fetching sub-levels:", error);
+    }
+  }
   
 
  
@@ -119,16 +203,24 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
     setProduct({ ...product, attributes: [...product.attributes, { key: "", value: "" }] });
   };
 
+  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const updatedTags = value.split(",").map(tag => tag.trim()); // Split tags by comma and trim spaces
+    setProduct({ ...product, tags: updatedTags });
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitting Product:", product);
     // Add logic to send data to your API
     const response = await axios.post('http://localhost:3000/api/products', product);
-    console.log(response.data);
+    success(response.data.message);
+    setProduct(initialProductState);
+    
   };
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+      {contextHolder}
       <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
       <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -181,6 +273,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
             name="thumbnailUrl"
             placeholder="Thumbnail URL"
             value={product.thumbnailUrl}
+            disabled
             onChange={handleChange}
             className="input-field"
           />
@@ -257,7 +350,9 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
             }
           </select>
 
-          <select
+          {
+            subCategories && subCategories.length > 0 && (
+              <select
             name="subCategories"
             value={product.subCategories[0] || ""}
             onChange={handleChange}
@@ -265,34 +360,41 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
             required
           >
             <option value="" disabled>
-              Select a subCategories
+              Select a sub-Category
             </option>
             {
-              categories.map((supplier) => (
+              subCategories.map((supplier) => (
                 <option key={supplier._id} value={supplier._id}>
                   {supplier.name}
                 </option>
               ))
             }
           </select>
-          <select
+              
+            )
+          }
+
+          {
+            subLevels && subLevels.length > 0 && (
+              <select
             name="subLevels"
             value={product.subLevels[0] || ""}
             onChange={handleChange}
             className="input-field"
             required
-          >
-            <option value="" disabled>
-              Select a subLevels
-            </option>
-            {
-              categories.map((supplier) => (
-                <option key={supplier._id} value={supplier._id}>
-                  {supplier.name}
-                </option>
-              ))
-            }
-          </select>
+            >
+              <option value="" disabled>
+                Select a subLevels
+              </option>
+              {
+                subLevels.map((supplier) => (
+                  <option key={supplier._id} value={supplier._id}>
+                    {supplier.name}
+                  </option>
+                ))
+              }
+            </select>)
+          }
 
        
 
@@ -345,6 +447,19 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
             onChange={handleChange}
             className="input-field"
             required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags</label>
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            placeholder="Enter tags separated by commas"
+            value={product.tags.join(", ")}
+            onChange={handleTagChange}
+            className="input-field"
           />
         </div>
 

@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 
 // Interface for SubSubCategory Document
-export interface ISubSubCategory extends Document {
+export interface ISubLevel extends Document {
   name: string;
   description?: string;
   subCategoryId: mongoose.Types.ObjectId; // Reference to the SubCategory model
@@ -33,8 +33,8 @@ const SubLevelSchema: Schema = new Schema(
   }
 );
 
-const SubSubCategory =
-  mongoose.models.SubSubCategory ||
-  mongoose.model<ISubSubCategory>("SubLevel", SubLevelSchema);
+const SubLevel =
+  mongoose.models.SubLevel ||
+  mongoose.model<ISubLevel>("SubLevel", SubLevelSchema);
 
-export default SubSubCategory;
+export default SubLevel;
