@@ -68,10 +68,10 @@ export default async function InvoicesTable({
                   Amount
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                Quantity
+                Stock
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Status
+                  Brand
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Action
