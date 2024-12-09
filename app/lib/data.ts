@@ -9,6 +9,9 @@ import {
   Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
+import connectMongo from "@/app/lib/mongodb";
+import Product, { IProduct } from "@/app/schema/productSchema";
+import Supplier from '../schema/supplierSchema';
 
 export async function fetchRevenue() {
   try {
@@ -112,40 +115,6 @@ export async function fetchFilteredInvoices(
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
-    return invoices.rows;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoices.');
-  }
-}
-
-export async function fetchFilteredSuppliers(
-  query: string,
-  currentPage: number,
-) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
-  try {
-    const invoices = await sql<InvoicesTable>`
-      SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
-    `;
     console.log(invoices.rows);
     return invoices.rows;
   } catch (error) {
@@ -153,6 +122,8 @@ export async function fetchFilteredSuppliers(
     throw new Error('Failed to fetch invoices.');
   }
 }
+
+
 
 export async function fetchInvoicesPages(query: string) {
   try {
@@ -280,5 +251,123 @@ export async function fetchSubCategory(id:string) {
   } catch (error) {
     console.error('Error fetching categories:', error);
     return [];
+  }
+}
+
+
+export async function fetchFilteredProducts(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    await connectMongo();
+    const searchCriteria = {
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { sku: { $regex: query, $options: 'i' } },
+        { brand: { $regex: query, $options: 'i' } },
+        
+      ],
+    };
+
+    // Fetching specific fields
+    const products = await Product.find(searchCriteria)
+      .select('name thumbnailUrl sku sellingPrice stock brand') // Fetch only these fields
+      .skip(offset)
+      .limit(ITEMS_PER_PAGE)
+      .exec();
+    console.log(products);
+    return products;
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    throw new Error('Failed to fetch product details.');
+  }
+}
+
+export async function fetchProductPages(query: string) {
+  try {
+    await connectMongo();
+    // Use a dynamic search query with regular expressions
+    const searchQuery = {
+      $or: [
+        { name: { $regex: query, $options: 'i' } }, // Case-insensitive search for name
+        { brand: { $regex: query, $options: 'i' } }, // Case-insensitive search for brand
+        { sku: { $regex: query, $options: 'i' } }, // Case-insensitive search for SKU
+        { warranty: { $regex: query, $options: 'i' } }, // Case-insensitive search for warranty
+        { description: { $regex: query, $options: 'i' } }, // Case-insensitive search for description
+      ],
+    };
+
+    // Count the total number of matching documents
+    const totalCount = await Product.countDocuments(searchQuery);
+
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+    return totalPages;
+  } catch (error) {
+    console.error('Error fetching total product pages:', error);
+    throw new Error('Failed to fetch total number of products.');
+  }
+}
+
+export async function fetchFilteredSuppliers(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    await connectMongo();
+    const searchCriteria = {
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } },
+        { phone: { $regex: query, $options: 'i' } },
+        { address: { $regex: query, $options: 'i' } },
+        
+      ],
+    };
+
+    // Fetching specific fields
+    const supplirs = await Supplier.find(searchCriteria)
+      .select('name email phone address') // Fetch only these fields
+      .skip(offset)
+      .limit(ITEMS_PER_PAGE)
+      .exec();
+    console.log(supplirs);
+    return supplirs;
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    throw new Error('Failed to fetch product details.');
+  }
+}
+
+export async function fetchSuppliersPages(query: string) {
+  try {
+    await connectMongo();
+    // Use a dynamic search query with regular expressions
+    const searchQuery = {
+      $or: [
+        { name: { $regex: query, $options: 'i' } }, // Case-insensitive search for name
+        { email: { $regex: query, $options: 'i' } }, // Case-insensitive search for brand
+        { phone: { $regex: query, $options: 'i' } }, // Case-insensitive search for SKU
+        { address: { $regex: query, $options: 'i' } }, // Case-insensitive search for warranty
+        // { description: { $regex: query, $options: 'i' } }, // Case-insensitive search for description
+      ],
+    };
+
+    // Count the total number of matching documents
+    const totalCount = await Supplier.countDocuments(searchQuery);
+
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+    return totalPages;
+  } catch (error) {
+    console.error('Error fetching total product pages:', error);
+    throw new Error('Failed to fetch total number of products.');
   }
 }

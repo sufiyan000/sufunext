@@ -212,7 +212,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
     e.preventDefault();
     console.log("Submitting Product:", product);
     // Add logic to send data to your API
-    const response = await axios.post('http://localhost:3000/api/products', product);
+    const response = await axios.post('/api/products', product);
     success(response.data.message);
     setProduct(initialProductState);
     

@@ -1,11 +1,11 @@
 import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
-import Table from '@/app/ui/invoices/table';
+import Table from '@/app/ui/suppliers/table';
 import { CreateSuppliers } from '@/app/ui/suppliers/button';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchInvoicesPages } from '@/app/lib/data';
+import { fetchSuppliersPages } from '@/app/lib/data';
  
 export default async function Page({
   searchParams,
@@ -18,7 +18,7 @@ export default async function Page({
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchInvoicesPages(query);
+  const totalPages = await fetchSuppliersPages(query);
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
