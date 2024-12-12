@@ -1,5 +1,5 @@
 import { Table } from "antd";
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/ui/dashboard/invoices/breadcrumbs';
 import { Button } from "@/app/ui/button";
 import Link from "next/link";
 export default async function Page() {

@@ -1,7 +1,7 @@
-import CategoryPage from "@/app/ui/category/category";
-import Add from "@/app/ui/category/add";
+import CategoryPage from "@/app/ui/dashboard/category/category";
+import Add from "@/app/ui/dashboard/category/add";
 import { fetchCategory} from "@/app/lib/data";
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/ui/dashboard/invoices/breadcrumbs';
 
 export default async function Page() {
   const categories = await fetchCategory();

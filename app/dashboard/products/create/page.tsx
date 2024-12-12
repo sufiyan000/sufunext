@@ -1,6 +1,6 @@
-import CreateProduct from "@/app/ui/products/create-products";
+import CreateProduct from "@/app/ui/dashboard/products/create-products";
 import { fetchCategory, fetchSuppliers } from '@/app/lib/data';
-import Breadcrumbs from "@/app/ui/products/breadcrumbs";
+import Breadcrumbs from "@/app/ui/dashboard/products/breadcrumbs";
 export default async function Page() {
   const category = await fetchCategory();
   const supplier = await fetchSuppliers();

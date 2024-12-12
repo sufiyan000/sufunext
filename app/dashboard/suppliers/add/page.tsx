@@ -1,5 +1,5 @@
-import SupplierManager from "@/app/ui/suppliers/add-suppliers";
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import SupplierManager from "@/app/ui/dashboard/suppliers/add-suppliers";
+import Breadcrumbs from '@/app/ui/dashboard/invoices/breadcrumbs';
 export default async function Page() {
  
     

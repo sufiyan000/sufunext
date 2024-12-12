@@ -1,5 +1,5 @@
-import CategoryPage from "@/app/ui/category/category";
-import SubCategoryPage from "@/app/ui/category/sub-category";
+import CategoryPage from "@/app/ui/dashboard/category/category";
+import SubCategoryPage from "@/app/ui/dashboard/category/sub-category";
 import { fetchCategory} from "@/app/lib/data";
 
 export default async function Page() {

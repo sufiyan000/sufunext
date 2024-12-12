@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import mongoose from 'mongoose';
 import axios from 'axios';
 import {
   CustomerField,
@@ -11,6 +12,9 @@ import {
 import { formatCurrency } from './utils';
 import connectMongo from "@/app/lib/mongodb";
 import Product, { IProduct } from "@/app/schema/productSchema";
+import Category from '../schema/categorySchema';
+import SubCategory from '../schema/subCategorySchema';
+import SubLevel from '../schema/subLevelSchema';
 import Supplier from '../schema/supplierSchema';
 
 export async function fetchRevenue() {
@@ -87,7 +91,7 @@ export async function fetchCardData() {
   }
 }
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 20;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
@@ -274,11 +278,10 @@ export async function fetchFilteredProducts(
 
     // Fetching specific fields
     const products = await Product.find(searchCriteria)
-      .select('name thumbnailUrl sku sellingPrice stock brand') // Fetch only these fields
+      .select('name thumbnailUrl sku sellingPrice stock brand sellingPrice regularPrice') // Fetch only these fields
       .skip(offset)
       .limit(ITEMS_PER_PAGE)
       .exec();
-    console.log(products);
     return products;
   } catch (error) {
     console.error('Error fetching product details:', error);
@@ -370,4 +373,82 @@ export async function fetchSuppliersPages(query: string) {
     console.error('Error fetching total product pages:', error);
     throw new Error('Failed to fetch total number of products.');
   }
+}
+
+export async function fetchProductById(id: string) {
+  await connectMongo();
+  
+  try {
+    // // Validate the MongoDB ObjectId
+    // if (!mongoose.Types.ObjectId.isValid(id as string)) {
+    //     return res.status(400).json({ message: 'Invalid product ID' });
+    // }
+
+    // Fetch the product by ID
+    const product = await Product.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(id as string) } },
+      {
+          $lookup: {
+              from: 'categories',
+              localField: 'categories',
+              foreignField: '_id',
+              as: 'categories',
+          },
+      },
+      {
+          $lookup: {
+              from: 'subcategories',
+              localField: 'subCategories',
+              foreignField: '_id',
+              as: 'subCategories',
+          },
+      },
+      {
+          $lookup: {
+              from: 'sublevels',
+              localField: 'subLevels',
+              foreignField: '_id',
+              as: 'subLevels',
+          },
+      },
+      {
+          $project: {
+              name: 1,
+              thumbnailUrl: 1,
+              videoUrl: 1,
+              brand: 1,
+              sku: 1,
+              warranty: 1,
+              description: 1,
+              suppliers: 1,
+              purchasePrice: 1,
+              sellingPrice: 1,
+              regularPrice: 1,
+              stock: 1,
+              categories: { name: 1, description: 1 },
+              subCategories: { name: 1 },
+              subLevels: { name: 1, description: 1 },
+              attributes: 1,
+              tags: 1,
+              isFeatured: 1,
+              images: 1,
+              createdAt: 1,
+              updatedAt: 1,
+          },
+      },
+  ]);
+  console.log(product);
+        // .populate('Category', 'name') // Populate categories if necessary
+        // .populate('SubCategory', 'name') // Populate subcategories if necessary
+        // .populate('SubLevel', 'name'); // Populate sublevels if necessary
+
+    // if (!product) {
+    //     return res.status(404).json({ message: 'Product not found' });
+    // }
+
+   return "hello";
+} catch (error) {
+  console.error('Database Error:', error);
+  throw new Error('Failed to fetch product.');
+}
 }

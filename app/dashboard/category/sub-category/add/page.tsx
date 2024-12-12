@@ -1,5 +1,5 @@
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
-import AddSubCategoryForm from "@/app/ui/category/sub-category";
+import Breadcrumbs from '@/app/ui/dashboard/invoices/breadcrumbs';
+import AddSubCategoryForm from "@/app/ui/dashboard/category/sub-category";
 import { fetchCategory } from '@/app/lib/data';
 export default async function Page() {
     const category = await fetchCategory();
