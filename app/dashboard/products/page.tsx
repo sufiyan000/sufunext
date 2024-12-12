@@ -5,7 +5,7 @@ import { CreateProduct } from '@/app/ui/products/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchInvoicesPages } from '@/app/lib/data';
+import { fetchProductPages } from '@/app/lib/data';
  
 export default async function Page({
   searchParams,
@@ -18,7 +18,7 @@ export default async function Page({
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchInvoicesPages(query);
+  const totalPages = await fetchProductPages(query);
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">

@@ -3,6 +3,7 @@ import AddSubCategoryForm from "@/app/ui/category/sub-category";
 import { fetchCategory } from '@/app/lib/data';
 export default async function Page() {
     const category = await fetchCategory();
+    console.log(category,"sufiyan");
  
     return (
        <main>

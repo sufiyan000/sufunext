@@ -53,7 +53,7 @@ export default function SupplierManager() {
       website: formData.website,
 
     }
-      const response = await axios.post('http://localhost:3000/api/suppliers', data);
+      const response = await axios.post('/api/suppliers', data);
       success(response.data.message);
     const newSupplier: Supplier = {
       ...formData,
