@@ -24,6 +24,7 @@
     "react": "19.0.0-rc-f38c22b244-20240704",
     "react-data-table-component": "^7.6.2",
     "react-dom": "19.0.0-rc-f38c22b244-20240704",
+    "react-medium-image-zoom": "^5.2.12",
     "tailwindcss": "3.4.4",
     "typescript": "5.5.2",
     "use-debounce": "^10.0.1",

@@ -452,3 +452,128 @@ export async function fetchProductById(id: string) {
   throw new Error('Failed to fetch product.');
 }
 }
+
+
+
+
+export async function getProductByIdUsingAggregate(id: string) {
+  await connectMongo();
+  try {
+
+    const result = await Product.aggregate([
+      // Match the product by ID
+      { $match: { _id: new mongoose.Types.ObjectId(id as string) } },
+      // Lookup related categories, subCategories, and subLevels
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categories',
+          foreignField: '_id',
+          as: 'categories',
+        },
+      },
+      {
+        $lookup: {
+          from: 'subcategories',
+          localField: 'subCategories',
+          foreignField: '_id',
+          as: 'subCategories',
+        },
+      },
+      {
+        $lookup: {
+          from: 'sublevels',
+          localField: 'subLevels',
+          foreignField: '_id',
+          as: 'subLevels',
+        },
+      },
+      // Project fields to transform the data
+      {
+        $project: {
+          id: { $toString: '$_id' },
+          name: 1,
+          thumbnailUrl: 1,
+          regularPrice: 1,
+          salePrice: '$sellingPrice',
+          images: 1,
+          description: 1,
+          warranty: 1,
+          specifications: {
+            brand: '$brand',
+            model: '$sku',
+            batteryLife: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: '$attributes',
+                    as: 'attr',
+                    cond: { $eq: ['$$attr.key', 'Battery Life'] },
+                  },
+                },
+                0,
+              ],
+            },
+            connectivity: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: '$attributes',
+                    as: 'attr',
+                    cond: { $eq: ['$$attr.key', 'Connectivity'] },
+                  },
+                },
+                0,
+              ],
+            },
+            color: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: '$attributes',
+                    as: 'attr',
+                    cond: { $eq: ['$$attr.key', 'Color'] },
+                  },
+                },
+                0,
+              ],
+            },
+          },
+          highlights: [
+            'Noise cancellation technology',
+            '20-hour battery life',
+            'Comfortable over-ear design',
+            'Bluetooth 5.0 connectivity',
+          ],
+          reviews: [
+            {
+              user: 'John Doe',
+              rating: 4,
+              comment: 'Great sound quality and comfortable to wear.',
+            },
+            {
+              user: 'Jane Smith',
+              rating: 5,
+              comment: 'Amazing battery life and noise cancellation!',
+            },
+          ],
+          deliveryInfo: 'Free delivery within 3-5 business days. Cash on Delivery available.',
+        },
+      },
+    ]);
+
+    if (!result.length) {
+      throw new Error('Product not found');
+    }
+
+    return {
+      ...result[0],
+      id: result[0]._id.toString(), // Convert `_id` to string
+      _id: undefined,               // Remove the `_id` field if not needed
+    }; // Return the transformed product object
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error fetching product');
+  }
+};
+
