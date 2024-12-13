@@ -3,27 +3,28 @@ import React from 'react';
 import Link from 'next/link';
 import Search from '@/app/ui/search';
 import AcmeLogo from '@/app/ui/acme-logo';
+import { lusitana } from '@/app/ui/fonts';
 const Header = () => {
   return (
-    <header className="bg-gray-900 text-white py-4 sticky">
-      <div className="container mx-auto flex justify-between items-center">
+    <header className="bg-gray-900 text-white sticky p-4">
+      <div className="container h-[50px] mx-auto flex justify-between items-center">
         {/* Logo */}
         <AcmeLogo />
 
         {/* Navigation Links */}
         <nav className="hidden md:flex space-x-6">
-          <a href="/" className="text-sm hover:text-[#07f0f0]">
-            Home
-          </a>
-          <a href="/shop" className="text-sm hover:text-[#07f0f0]">
-            Shop
-          </a>
-          <a href="/categories" className="text-sm hover:text-[#07f0f0]">
-            Categories
-          </a>
-          <a href="/deals" className="text-sm hover:text-[#07f0f0]">
-            Deals
-          </a>
+          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
+              Home
+          </Link>
+          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
+              Shop
+          </Link>
+          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
+              Category
+          </Link>
+          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
+              Services
+          </Link>
         </nav>
 
         {/* Search Bar */}

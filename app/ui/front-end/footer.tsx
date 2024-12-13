@@ -1,9 +1,10 @@
 // Footer.jsx
 import React from 'react';
 import Image from 'next/image';
+import { lusitana } from '@/app/ui/fonts';
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white py-8 px-4">
+    <footer className={`${lusitana.className} bg-gray-900 text-white py-8 px-4`}>
       <div className="container mx-auto grid md:grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Company Information */}
         <div>
@@ -12,7 +13,8 @@ const Footer = () => {
           </h3>
           <p className="text-sm mb-2">192 Ratnakala building ved raod pandol, surat, India</p>
           <p className="text-sm mb-2">Email: faydazone67@company.com</p>
-          <p className="text-sm">Phone: +91 9601420947</p>
+          <p className="text-sm mb-2">Phone: +91 9601420947</p>
+          <p className="text-sm">Customer Support: +91 8511888678</p>
         </div>
 
         {/* Quick Links */}

@@ -1,6 +1,5 @@
 import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
-import logo from "@/public/logo.png"
 import Image from 'next/image';
 
 export default function AcmeLogo() {
@@ -8,7 +7,7 @@ export default function AcmeLogo() {
     <div
       className={`${lusitana.className} items-center leading-none text-white`}
     >
-      <Image src="/logo.png" width={100} alt='logo' height={100} />
+      <Image src="/logo.png" width={170} alt='logo' height={170} />
     </div>
   );
 }

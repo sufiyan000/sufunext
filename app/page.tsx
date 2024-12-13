@@ -28,15 +28,15 @@ export default async function Page(
       <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
         <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
           <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-            <strong>Welcome to FaydaZone.</strong>FaydaZone Bole To faydey Ki guarantee
+            <strong>Welcome to FaydaZone.</strong>FaydaZone Bole To faydey Ki<strong> 100%</strong> guarantee<br />
             <a href="https://sufiyanakhtar.netlify.app/" className="text-blue-500">
-              Founder
+            Founder -
             </a>
-            Er Sufiyan Akhtar
+             Er Sufiyan Akhtar
           </p>
           <Link
             href="/login"
-            className="flex items-center gap-5 self-start rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
+            className="flex items-center gap-5 self-start rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
           >
             <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
           </Link>
