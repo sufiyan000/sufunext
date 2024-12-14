@@ -42,7 +42,7 @@ const Header = () => {
 
         {/* Icons for Cart and User Account */}
         <div className="flex items-center space-x-4">
-        <Link href="/cart" className="text-sm hover:text-[#07f0f0] relative">
+        <Link href="/" className="text-sm hover:text-[#07f0f0] relative">
         <svg
               className="w-6 h-6"
               fill="none"
@@ -83,7 +83,7 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden">
+        {/* <div className="md:hidden">
           <button className="text-white focus:outline-none">
             <svg
               className="w-6 h-6"
@@ -100,7 +100,7 @@ const Header = () => {
               />
             </svg>
           </button>
-        </div>
+        </div> */}
       </div>
     </header>
   );

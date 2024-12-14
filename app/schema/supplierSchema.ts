@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, model, models } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // Interface for the Supplier Document
 export interface ISupplier extends Document {
@@ -64,6 +64,8 @@ const SupplierSchema: Schema = new Schema(
 );
 
 // Prevent Overwriting of Compiled Model
-const Supplier = models.Supplier || model<ISupplier>('Supplier', SupplierSchema);
+// Safely define and export the Supplier model
+const Supplier: Model<ISupplier> =
+  mongoose.models?.Supplier || mongoose.model<ISupplier>('Supplier', SupplierSchema);
 
 export default Supplier;

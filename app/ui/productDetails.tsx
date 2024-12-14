@@ -6,6 +6,7 @@ import 'react-medium-image-zoom/dist/styles.css';
 import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
 import Image from 'next/image';
+import { calculateDiscountPercentage } from './front-end/showProduct';
 
 interface ProductDetailsProps {
   product: {
@@ -98,6 +99,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
         <h1 className={`${lusitana.className} text-3xl font-bold mb-4`} style={{ color: '#07f0f0' }}>
           {product.name}
         </h1>
+        <p className={`${lusitana.className} text-lg text-gray-400 mb-2`}>
+          Discount: {calculateDiscountPercentage(product.regularPrice, product.salePrice)+"%"}
+        </p>
         <p className={`${lusitana.className} text-lg text-gray-400 mb-2`}>
           ₹{product.salePrice}{' '}
           <span className="line-through">₹{product.regularPrice}</span>

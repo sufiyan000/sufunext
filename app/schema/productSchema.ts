@@ -68,6 +68,7 @@ const productSchema = new Schema<IProduct>({
   });
 
 // Define and export the Product model
-const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);
+const Product: Model<IProduct> =
+  mongoose.models?.Product || mongoose.model<IProduct>('Product', productSchema);
 
 export default Product;

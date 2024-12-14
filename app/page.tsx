@@ -58,9 +58,14 @@ export default async function Page(
       />
         </div>
       </div>
+       <div className="flex">
+       <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
+            <strong>Products</strong>
+          </p>
+       </div>
       
          <Productshow query={query} currentPage={currentPage} />
-          <div className="mt-5 flex w-full justify-center">
+          <div className="mt-5 flex w-full justify-center mb-4">
               <Pagination totalPages={totalPages} />
             </div>
             <Footer />

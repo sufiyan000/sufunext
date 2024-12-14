@@ -3,6 +3,16 @@ import { fetchFilteredProducts } from '@/app/lib/data'; // Import the new fetch 
 import { Card } from 'antd';
 import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
+export function calculateDiscountPercentage(regularPrice: number, salePrice: number): number {
+  if (regularPrice <= 0) {
+    throw new Error("Regular price must be greater than zero");
+  }
+
+  // Calculate discount percentage and round down to nearest integer
+  const discountPercentage = Math.floor(((regularPrice - salePrice) / regularPrice) * 100);
+
+  return discountPercentage;
+}
 export default async function ProductsTable({
   query,
   currentPage,
@@ -11,6 +21,9 @@ export default async function ProductsTable({
   currentPage: number;
 }) {
   const products = await fetchFilteredProducts(query, currentPage); // Use the new function
+
+ 
+  
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4 lg:p-8">
@@ -48,7 +61,11 @@ export default async function ProductsTable({
                 <p className={`${lusitana.className} text-lg text-gray-800 md:text-lg md:leading-normal`}>
                 <strong>Rs.{product.sellingPrice}</strong>
                   </p>
-                <p className="text-sm text-green-600 mb-4">50% off</p>
+                <p className="text-sm text-green-600 mb-4">
+                  {
+                    calculateDiscountPercentage(product.regularPrice, product.sellingPrice)+"%"
+                  }
+                </p>
               </div>
             </Card>
           </Link>
