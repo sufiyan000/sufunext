@@ -42,6 +42,21 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
     setMainImage(image);
   };
 
+    // Generate WhatsApp Order URL
+    const handleWhatsAppOrder = () => {
+      const phoneNumber = '918511888678'; // Replace with your WhatsApp number
+      const message = `Hello, I would like to place an order for the following product:\n\n` +
+      `*Product Image*: ${product.thumbnailUrl}\n` +
+        `*Product Name*: ${product.name}\n` +
+        `*Sale Price*: ₹${product.salePrice}\n` +
+        `*Regular Price*: ₹${product.regularPrice}\n` +
+        // `*Rating*: ${product.rating} (${product.ratingCount} reviews)\n\n` +
+        `Please let me know how to proceed.`;
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+    };
+  
+
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -95,7 +110,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
             ({product.ratingCount} reviews)
           </span>
         </div>
-        <p className={`${lusitana.className} text-gray-300 mb-6`}>{product.description}</p>
+       
         <Link
             href="/"
             className={`${lusitana.className} flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base mb-4`}
@@ -128,6 +143,19 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           {deliveryMessage && <p className="text-gray-300 mt-2">{deliveryMessage}</p>}
         </div>
       </div>
+    </div>
+    
+    {/* description */}
+    <div className="mt-12">
+      <h3 className={`${lusitana.className} text-xl font-bold mb-4`} style={{ color: '#07f0f0' }}>
+        Description
+      </h3>
+      {product.description && (
+         <p className={`${lusitana.className} text-gray-500 mb-6`}>{product.description}</p>
+      )
+      }
+      
+      
     </div>
 
     {/* Specifications and Highlights */}
@@ -190,6 +218,18 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
         
       </div>
     </div>
+      {/* WhatsApp Floating Button */}
+      <button
+        onClick={handleWhatsAppOrder}
+        className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg flex items-center space-x-2 hover:bg-green-600 transition"
+      >
+        <img
+          src="/icons8-whatsapp.gif" // Replace with a valid WhatsApp icon
+          alt="WhatsApp"
+          className="w-6 h-6"
+        />
+        <span className="hidden sm:block">Order on WhatsApp</span>
+      </button>
     </div>
   );
 };
