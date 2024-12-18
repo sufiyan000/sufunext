@@ -52,16 +52,16 @@ const Footer = () => {
             Follow Us
           </h3>
           <div className="flex space-x-4">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.facebook.com/profile.php?id=61567854066618" target="_blank" rel="noopener noreferrer">
               <Image src="/icons8-facebook.svg" width={50} height={50} alt="Facebook" className="h-6 w-6" />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+            <a href="/" target="_blank" rel="noopener noreferrer">
               <Image src="/icons8-twitter.svg"  width={50} height={50} alt="Twitter" className="h-6 w-6" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.instagram.com/fayda_zone" target="_blank" rel="noopener noreferrer">
               <Image src="/icons8-instagram.svg"  width={50} height={50} alt="Instagram" className="h-6 w-6" />
             </a>
-            <a href="https://linkedin.com"  target="_blank" rel="noopener noreferrer">
+            <a href="/"  target="_blank" rel="noopener noreferrer">
               <Image src="/icons8-linkedin.svg"  width={50} height={50} alt="LinkedIn" className="h-6 w-6" />
             </a>
           </div>
@@ -70,7 +70,7 @@ const Footer = () => {
 
       {/* Copyright */}
       <div className="mt-8 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} Company Name. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Faydazone. All rights reserved.</p>
       </div>
     </footer>
   );

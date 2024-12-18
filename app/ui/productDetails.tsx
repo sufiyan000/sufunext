@@ -121,6 +121,17 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           >
            Add To Cart
           </Link>
+          <button
+            onClick={handleWhatsAppOrder}
+            className={`${lusitana.className} w-full flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base mb-4`}
+          >
+            <img
+          src="/icons8-whatsapp.png" // Replace with a valid WhatsApp icon
+          alt="WhatsApp"
+          className="w-6 h-6"
+        />
+           Order on Whatspp
+          </button>
         <Link
             href="/"
             className={`${lusitana.className} flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base`}
@@ -222,18 +233,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
         
       </div>
     </div>
-      {/* WhatsApp Floating Button */}
-      <button
-        onClick={handleWhatsAppOrder}
-        className="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg flex items-center space-x-2 hover:bg-green-600 transition"
-      >
-        <img
-          src="/icons8-whatsapp.gif" // Replace with a valid WhatsApp icon
-          alt="WhatsApp"
-          className="w-6 h-6"
-        />
-        <span className="hidden sm:block">Order on WhatsApp</span>
-      </button>
+      
     </div>
   );
 };

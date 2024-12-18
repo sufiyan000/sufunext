@@ -25,14 +25,10 @@ export default async function Page(
   return (
     <>
       <Header />
-      <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
+      <div className="mt-4 flex grow flex-col gap-4 md:flex-row mb-2">
         <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
           <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-            <strong>Welcome to FaydaZone.</strong>FaydaZone Bole To faydey Ki<strong> 100%</strong> guarantee<br />
-            <a href="https://sufiyanakhtar.netlify.app/" className="text-blue-500">
-            Founder -
-            </a>
-             Er Sufiyan Akhtar
+            <strong>Welcome to FaydaZone.</strong>FaydaZone Bole To faydey Ki<strong> 100%</strong> Guarantee<br />
           </p>
           <Link
             href="/login"
@@ -58,9 +54,9 @@ export default async function Page(
       />
         </div>
       </div>
-       <div className="flex">
-       <p className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-            <strong>Products</strong>
+       <div className="flex justify-center">
+       <p className={`${lusitana.className} text-center text-xl text-gray-800 md:text-3xl md:leading-normal`}>
+           All Products
           </p>
        </div>
       

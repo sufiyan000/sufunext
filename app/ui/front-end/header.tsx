@@ -29,7 +29,7 @@ const Header = () => {
 
         {/* Search Bar */}
         <div className="flex items-center space-x-2 text-black">
-          <Search placeholder="Search invoices..." />
+          <Search placeholder="Search Products..." />
           {/* <input
             type="text"
             placeholder="Search products..."
