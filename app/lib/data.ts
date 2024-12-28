@@ -502,49 +502,19 @@ export async function getProductByIdUsingAggregate(id: string) {
           specifications: {
             brand: '$brand',
             model: '$sku',
-            batteryLife: {
-              $arrayElemAt: [
-                {
-                  $filter: {
-                    input: '$attributes',
-                    as: 'attr',
-                    cond: { $eq: ['$$attr.key', 'Battery Life'] },
-                  },
+          },
+          highlights: {
+            $arrayToObject: {
+              $map: {
+                input: '$attributes',
+                as: 'attr',
+                in: {
+                  k: '$$attr.key',
+                  v: '$$attr.value',
                 },
-                0,
-              ],
-            },
-            connectivity: {
-              $arrayElemAt: [
-                {
-                  $filter: {
-                    input: '$attributes',
-                    as: 'attr',
-                    cond: { $eq: ['$$attr.key', 'Connectivity'] },
-                  },
-                },
-                0,
-              ],
-            },
-            color: {
-              $arrayElemAt: [
-                {
-                  $filter: {
-                    input: '$attributes',
-                    as: 'attr',
-                    cond: { $eq: ['$$attr.key', 'Color'] },
-                  },
-                },
-                0,
-              ],
+              },
             },
           },
-          highlights: [
-            'Noise cancellation technology',
-            '20-hour battery life',
-            'Comfortable over-ear design',
-            'Bluetooth 5.0 connectivity',
-          ],
           reviews: [
             {
               user: 'John Doe',

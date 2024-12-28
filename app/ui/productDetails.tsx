@@ -27,6 +27,7 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+  console.log(product);
   const [mainImage, setMainImage] = useState(product.thumbnailUrl || '');
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
@@ -192,9 +193,12 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           <h3 className={`${lusitana.className} text-xl font-bold mb-4`} style={{ color: '#07f0f0' }}>
             Highlights
           </h3>
-          <ul className="text-gray-500 space-y-2">
-            {product.highlights.map((highlight, index) => (
-              <li key={index}>- {highlight}</li>
+          <ul className="text-gray-500 space-y-4">
+            {Object.entries(product.highlights).map(([key, value], index) => (
+              <li key={index} className="flex flex-col">
+                <span className={`${lusitana.className} text-lg text-black font-bold mb-2`} >{key}</span>
+                <span>{value}</span>
+              </li>
             ))}
           </ul>
         </div>

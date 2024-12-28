@@ -37,8 +37,8 @@ export default async function ProductsTable({
                 product.thumbnailUrl ? (
                   <Image
                     src={product.thumbnailUrl}
-                    width={100}
-                    height={100}
+                    width={500}
+                    height={500}
                     alt={product.name || 'Product Image'}
                     className="h-40 w-full object-cover"
                   />
