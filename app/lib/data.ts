@@ -279,6 +279,7 @@ export async function fetchFilteredProducts(
     // Fetching specific fields
     const products = await Product.find(searchCriteria)
       .select('name thumbnailUrl sku sellingPrice stock brand sellingPrice regularPrice') // Fetch only these fields
+      .sort({ createdAt: -1 }) 
       .skip(offset)
       .limit(ITEMS_PER_PAGE)
       .exec();
