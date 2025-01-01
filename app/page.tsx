@@ -7,6 +7,7 @@ import Pagination from '@/app/ui/dashboard/invoices/pagination';
 import Productshow from '@/app/ui/front-end/showProduct';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchProductPages } from '@/app/lib/data';
+import Category from './ui/front-end/category-showcase';
 
 export default async function Page(
   {
