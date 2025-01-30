@@ -57,6 +57,7 @@ export async function fetchLatestInvoices() {
 }
 
 export async function fetchCardData() {
+  await connectMongo();
   try {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
@@ -76,8 +77,12 @@ export async function fetchCardData() {
 
     const numberOfInvoices = Number(data[0].rows[0].count ?? '0');
     const numberOfCustomers = Number(data[1].rows[0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2].rows[0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2].rows[0].pending ?? '0');
+    const totalPaidInvoices = await Product.countDocuments();
+    const products = await Product.find();
+    const totalPendingInvoices = products.reduce((total, product) => {
+      const productInvestment = product.purchasePrice * product.stock; // Har product ka investment
+      return total + productInvestment; // Total add karein
+    }, 0);
 
     return {
       numberOfCustomers,
@@ -547,4 +552,8 @@ export async function getProductByIdUsingAggregate(id: string) {
     throw new Error('Error fetching product');
   }
 };
+
+export async function getSubCategoryById(id: string) {
+  await connectMongo();
+}
 

@@ -19,7 +19,7 @@ const Header = () => {
           <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
               Shop
           </Link>
-          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
+          <Link href="/category" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
               Category
           </Link>
           <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>

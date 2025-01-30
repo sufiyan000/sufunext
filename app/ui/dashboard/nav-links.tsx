@@ -7,7 +7,8 @@ import {
   RectangleGroupIcon,
   ShoppingCartIcon,
   ClipboardDocumentCheckIcon,
-  CurrencyRupeeIcon
+  CurrencyRupeeIcon,
+  ShoppingBagIcon
   
 } from '@heroicons/react/24/outline';
 import { useState } from'react';
@@ -53,6 +54,12 @@ const links = [
     name:'Transactions',
     href: '/dashboard/transactions',
     icon:CurrencyRupeeIcon,
+    
+  },
+  {
+    name:'Purchase',
+    href: '/dashboard/purchase',
+    icon:ShoppingBagIcon,
     
   },
 ];
