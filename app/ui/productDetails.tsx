@@ -27,7 +27,6 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
-  console.log(product);
   const [mainImage, setMainImage] = useState(product.thumbnailUrl || '');
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');

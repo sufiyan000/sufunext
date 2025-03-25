@@ -452,7 +452,7 @@ export async function fetchProductById(id: string) {
     //     return res.status(404).json({ message: 'Product not found' });
     // }
 
-   return "hello";
+   return product;
 } catch (error) {
   console.error('Database Error:', error);
   throw new Error('Failed to fetch product.');

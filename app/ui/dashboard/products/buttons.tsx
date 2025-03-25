@@ -1,3 +1,4 @@
+"use client";
 import { PencilIcon, PlusIcon, TrashIcon,ViewfinderCircleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -16,7 +17,7 @@ export function CreateProduct() {
 export function UpdateInvoice({ id }: { id: string }) {
   return (
     <Link
-    href={`/dashboard/products/${id}/edit`}
+      href={`/dashboard/products/${id}/edit`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -36,12 +37,15 @@ export function DeleteInvoice({ id }: { id: string }) {
 }
 
 export function ViewProduct({ id }: { id: string }) {
+ 
   return (
-    <>
-      <button className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">view</span>
-        <ViewfinderCircleIcon className="w-5" />
-      </button>
+    <>  
+    <Link
+      href={`/dashboard/products/${id}/view`}
+      className="rounded-md border p-2 hover:bg-gray-100"
+    >
+      <ViewfinderCircleIcon className="w-5" />
+    </Link>
     </>
   );
 }

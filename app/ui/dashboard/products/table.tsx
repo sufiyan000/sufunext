@@ -46,7 +46,7 @@ export default async function ProductsTable({
                   <div className="flex justify-end gap-2">
                     <UpdateInvoice id={product._id as string} />
                     <DeleteInvoice id={product._id as string} />
-                    <ViewProduct id={product._id as string} />
+                   <ViewProduct id={product._id as string} />
                   </div>
                 </div>
               </div>
