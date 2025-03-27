@@ -11,15 +11,15 @@ export default async function Page({ params }: { params: { id: string } }) {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'Invoices', href: '/dashboard/invoices' },
+          { label: 'Products', href: '/dashboard/products' },
           {
-            label: 'Edit Invoice',
+            label: 'Edit Products',
             href: `/dashboard/products/${id}/edit`,
             active: true,
           },
         ]}
       />
-      <EditProductForm  />
+      <EditProductForm product={data}  />
     </main>
   );
 }

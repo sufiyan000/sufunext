@@ -14,7 +14,7 @@ export interface IProduct extends Document {
     sku: string;
     warranty: string;
     description?: string;
-    suppliers: string;
+    suppliers: mongoose.Types.ObjectId;
     purchasePrice: number;
     sellingPrice: number;
     regularPrice: number;
@@ -39,7 +39,7 @@ const productSchema = new Schema<IProduct>({
     sku: { type: String, required: true},
     warranty: { type: String},
     description: { type: String },
-    suppliers: { type: String, required: true},
+    suppliers:{ type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true }, // Relation with Supplier model
     purchasePrice: { type: Number, required: true },
     sellingPrice: { type: Number, required: true },
     regularPrice: { type: Number, required: true},

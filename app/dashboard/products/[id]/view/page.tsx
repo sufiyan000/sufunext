@@ -9,14 +9,20 @@ type Product = {
     description: string;
     sellingPrice: number;
     purchasePrice: number;
-    suppliers: string;
-    categories: string[];
+    suppliers: any;
+    supplierDetails: any;
+    categoryDetails: string;
+    subCategoryDetails: string;
+    subLevelDetails: string;
+    stock: number;
+    isFeatured: boolean;
     attributes: { key: string; value: string }[];
 };
 
 export default async function Page({ params }: { params: { id: string } }) {
     const id = params.id;
     const productData = await fetchProductById(id);
+    console.log(productData);
     const product: Product | null = Array.isArray(productData) ? productData[0] : productData;
 
     if (!product) {
@@ -50,6 +56,25 @@ export default async function Page({ params }: { params: { id: string } }) {
                 <p className="text-red-600 font-bold mt-2">
                     Purchase: ₹{product.purchasePrice}
                 </p>
+                <p className="text-purple-600 font-bold mt-2">
+                    Category: {product.categoryDetails}
+                </p>
+                <p className="text-orange-600 font-bold mt-2">
+                    Sub Category: {product.subCategoryDetails}
+                </p>
+                <p className="text-indigo-600 font-bold mt-2">
+                    Sub-Level: {product.subLevelDetails}
+                </p>
+                <p className="text-pink-600 font-bold mt-2">
+                    Stock: {product.stock}
+                </p>
+                <p className="text-teal-600 font-bold mt-2">
+                    Is Featured: {product.isFeatured? 'Yes' : 'No'}
+                </p>
+                <p className="text-blue-600 font-bold mt-2">
+                    suppliers: {product.supplierDetails.name}
+                </p>
+                
                 <h3 className="text-lg font-semibold mt-4">Attributes:</h3>
                 <ul className="list-disc list-inside text-gray-700">
                     {product.attributes.map((attr, index) => (

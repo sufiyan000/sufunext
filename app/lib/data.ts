@@ -385,78 +385,120 @@ export async function fetchProductById(id: string) {
   await connectMongo();
   
   try {
-    // // Validate the MongoDB ObjectId
-    // if (!mongoose.Types.ObjectId.isValid(id as string)) {
-    //     return res.status(400).json({ message: 'Invalid product ID' });
-    // }
-
-    // Fetch the product by ID
-    const product = await Product.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(id as string) } },
+    const productWithDetails = await Product.aggregate([
       {
-          $lookup: {
-              from: 'categories',
-              localField: 'categories',
-              foreignField: '_id',
-              as: 'categories',
-          },
+        $match: { _id: new mongoose.Types.ObjectId(id) } // Sirf yeh specific product hi fetch hoga
+      },
+  
+      // Supplier ka data join karna
+      {
+        $lookup: {
+          from: "suppliers", // Supplier collection ka naam
+          localField: "suppliers",
+          foreignField: "_id",
+          as: "supplierDetails",
+        },
       },
       {
-          $lookup: {
-              from: 'subcategories',
-              localField: 'subCategories',
-              foreignField: '_id',
-              as: 'subCategories',
-          },
+        $unwind: {
+          path: "$supplierDetails",
+          preserveNullAndEmptyArrays: true, // Agar supplier na ho toh bhi product aaye
+        },
       },
+  
+      // Category ka data join karna
       {
-          $lookup: {
-              from: 'sublevels',
-              localField: 'subLevels',
-              foreignField: '_id',
-              as: 'subLevels',
-          },
+        $lookup: {
+          from: "categories",
+          localField: "categories",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
       },
+  
+      // SubCategory ka data join karna
       {
-          $project: {
-              name: 1,
-              thumbnailUrl: 1,
-              videoUrl: 1,
-              brand: 1,
-              sku: 1,
-              warranty: 1,
-              description: 1,
-              suppliers: 1,
-              purchasePrice: 1,
-              sellingPrice: 1,
-              regularPrice: 1,
-              stock: 1,
-              categories: { name: 1, description: 1 },
-              subCategories: { name: 1 },
-              subLevels: { name: 1, description: 1 },
-              attributes: 1,
-              tags: 1,
-              isFeatured: 1,
-              images: 1,
-              createdAt: 1,
-              updatedAt: 1,
-          },
+        $lookup: {
+          from: "subcategories",
+          localField: "subCategories",
+          foreignField: "_id",
+          as: "subCategoryDetails",
+        },
       },
-  ]);
-  console.log(product);
-        // .populate('Category', 'name') // Populate categories if necessary
-        // .populate('SubCategory', 'name') // Populate subcategories if necessary
-        // .populate('SubLevel', 'name'); // Populate sublevels if necessary
-
-    // if (!product) {
-    //     return res.status(404).json({ message: 'Product not found' });
-    // }
-
-   return product;
+  
+      // Sublevel ka data join karna
+      {
+        $lookup: {
+          from: "sublevels",
+          localField: "subLevels",
+          foreignField: "_id",
+          as: "subLevelDetails",
+        },
+      },
+  
+      // Output fields select karna
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          thumbnailUrl: 1,
+          videoUrl: 1,
+          brand: 1,
+          sku: 1,
+          warranty: 1,
+          description: 1,
+          suppliers: 1,
+          purchasePrice: 1,
+          sellingPrice: 1,
+          regularPrice: 1,
+          stock: 1,
+          attributes: 1,
+          tags: 1,
+          isFeatured: 1,
+          images: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          supplierDetails: {
+            name: 1,
+            email: 1,
+            phone: 1,
+          },
+          categoryDetails: "$categoryDetails.name",
+          subCategoryDetails: "$subCategoryDetails.name",
+          subLevelDetails: "$subLevelDetails.name",
+        },
+      },
+    ]);
+  
+    return productWithDetails[0] || null;
+  
 } catch (error) {
   console.error('Database Error:', error);
   throw new Error('Failed to fetch product.');
 }
+}
+
+export async function updateProductById(id: string) {
+  const productId = "ksks";
+  const updateData = {
+    name: "Updated Product Name",
+    brand: "Updated Brand",
+    // Add more fields as needed
+  };
+  await connectMongo();
+  try{
+
+    const updatedProduct = await Product.findByIdAndUpdate(productId, updateData, {
+      new: true, // Updated document return karega
+      runValidators: true, // Schema validations apply karega
+    });
+
+  }
+  catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to update product.');
+  }
+
 }
 
 
