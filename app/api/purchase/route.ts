@@ -46,10 +46,26 @@ export async function GET(request: Request) {
     try{
        const purchase = await Purchase.find().populate('suppliers_id', 'name').exec();
        console.log(purchase);
-       return NextResponse.json({status: "success", statusCode:200, message:"Purchases fetched successfully", purchase},{status:200});
+       return NextResponse.json(
+      {
+        status: "success",
+        statusCode: 200,
+        message: "Purchases fetched successfully",
+        purchase
+      },
+      { status: 200 }
+    );
 
     }
     catch(err: any) {
-        return NextResponse.json({status: "error", statusCode: 400, message: err.message}, {status: 400});
+        console.error("Error fetching purchases:", err);
+        return NextResponse.json(
+            {
+              status: "error",
+              statusCode: 400,
+              message: err.message
+            },
+            { status: 400 }
+          );
     }
 }

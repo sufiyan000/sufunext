@@ -59,6 +59,8 @@ const PurchasePDF = ({ supplier, products }: { supplier: string; products: Purch
 const PurchaseList = () => {
   const [purchases, setPurchases] = useState<PurchaseType[]>([]);
   const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // ✅ Unique Supplier Names
   const uniqueSuppliers = Array.from(new Set(purchases.map(order => order.suppliers_id.name)));
@@ -69,20 +71,29 @@ const PurchaseList = () => {
     : purchases;
 
 
-  useEffect(() => {
-    // Fetch purchases from API (replace with actual API call)
-    const fetchPurchases = async () => {
-      const response = await axios.get("/api/purchase"); // API endpoint
-      console.log(response.data);
-      setPurchases(response.data.purchase);
-    };
-    fetchPurchases();
-  }, []);
+    useEffect(() => {
+      const fetchPurchases = async () => {
+        try {
+          setLoading(true); // Show loading while fetching data
+          const response = await axios.get("/api/purchase"); // API call
+          console.log(response.data);
+          setPurchases(response.data.purchase); // Store fetched purchases
+        } catch (error: any) {
+          console.error("Error fetching purchases:", error);
+          setError("Failed to fetch purchases"); // Set error message
+        } finally {
+          setLoading(false); // Hide loading after request completes
+        }
+      };
+      fetchPurchases();
+    }, []);
 
   return (
     <div className="max-w-6xl mx-auto p-6">
       
       <div className="flex justify-between mb-4">
+      {loading && <p>Loading purchases...</p>}
+      {error && <p>Error: {error}</p>}
       <h2 className="text-2xl font-semibold mb-4">Purchase List</h2>
       
                  {/* Supplier Dropdown */}
