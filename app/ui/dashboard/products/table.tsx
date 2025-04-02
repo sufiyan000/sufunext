@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { UpdateInvoice, DeleteInvoice, ViewProduct } from '@/app/ui/dashboard/products/buttons';
+import { UpdateInvoice, DeleteInvoice, ViewProduct, Purchase } from '@/app/ui/dashboard/products/buttons';
 import { fetchFilteredProducts } from '@/app/lib/data'; // Import the new fetch function
 
 export default async function ProductsTable({
@@ -47,6 +47,7 @@ export default async function ProductsTable({
                     <UpdateInvoice id={product._id as string} />
                     <DeleteInvoice id={product._id as string} />
                    <ViewProduct id={product._id as string} />
+                   <Purchase id={product._id as string} />
                   </div>
                 </div>
               </div>
@@ -106,6 +107,7 @@ export default async function ProductsTable({
                       <UpdateInvoice id={product._id as string} />
                       <DeleteInvoice id={product._id as string} />
                       <ViewProduct id={product._id as string} />
+                      <Purchase id={product._id as string} />
                     </div>
                   </td>
                 </tr>
