@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import connectMongo from "@/app/lib/mongodb";
 import Purchase, { IPurchase} from "@/app/schema/purchaseSchema";
 import Product, { IProduct } from "@/app/schema/productSchema";
-import Supplier from "@/app/schema/supplierSchema";
 export async function POST(request: Request) {
     await connectMongo();
     try{
@@ -45,7 +44,41 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
     await connectMongo();
     try{
-       const purchase = await Purchase.find().populate('suppliers_id', 'name').exec();
+        const purchase = await Purchase.aggregate([
+            {
+              $lookup: {
+                from: "suppliers", // ✅ Supplier model ka exact collection name
+                localField: "suppliers_id",
+                foreignField: "_id",
+                as: "supplierDetails",
+              },
+            },
+            {
+              $unwind: {
+                path: "$supplierDetails",
+                preserveNullAndEmptyArrays: true, // Agar supplier na ho to bhi record aaye
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                product_id: 1,
+                product_image: 1,
+                title: 1,
+                price: 1,
+                quantity: 1,
+                total: 1,
+                purchase_status: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                __v: 1,
+                suppliers_id: {
+                  _id: "$supplierDetails._id",
+                  name: "$supplierDetails.name",
+                },
+              },
+            },
+          ]);
        console.log(purchase);
        return NextResponse.json(
       {
