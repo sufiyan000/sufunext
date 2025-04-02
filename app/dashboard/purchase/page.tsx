@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Image} from '@react-pdf/renderer';
+import axios from 'axios';
 type PurchaseType = {
   _id: string;
   product_image: string;
@@ -71,10 +72,9 @@ const PurchaseList = () => {
   useEffect(() => {
     // Fetch purchases from API (replace with actual API call)
     const fetchPurchases = async () => {
-      const res = await fetch("/api/purchase"); // API endpoint
-      const data = await res.json();
-      console.log(data);
-      setPurchases(data.purchase);
+      const response = await axios.get("/api/purchase"); // API endpoint
+      console.log(response.data);
+      setPurchases(response.data.purchase);
     };
     fetchPurchases();
   }, []);
