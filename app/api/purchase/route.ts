@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectMongo from "@/app/lib/mongodb";
 import Purchase, { IPurchase} from "@/app/schema/purchaseSchema";
 import Product, { IProduct } from "@/app/schema/productSchema";
+import Supplier from "@/app/schema/supplierSchema";
 export async function POST(request: Request) {
     await connectMongo();
     try{
