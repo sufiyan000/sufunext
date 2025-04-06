@@ -13,6 +13,10 @@ type PurchaseType = {
   suppliers_id: any;
   createdAt: string; // Date ko string ke roop me store karna better hai agar API se aa raha hai
 };
+type SupplierInfo = {
+  _id: string;
+  name: string;
+};
 
 const styles = StyleSheet.create({
   page: { padding: 20, fontSize: 12 },
@@ -41,7 +45,7 @@ const PurchasePDF = ({ supplier, products }: { supplier: string; products: Purch
 
           {products.map((purchase) => (
             <View key={purchase._id} style={styles.row}>
-              <Image src={purchase.product_image} style={{ width: 50, height: 50, margin: 5 }} />
+               <Image src={purchase.product_image || "https://via.placeholder.com/50"} style={{ width: 50, height: 50, margin: 5 }} />
               <Text style={[styles.cell, { flex: 2 }]}>{purchase.title}</Text>
               <Text style={[styles.cell, { flex: 1 }]}>{purchase.price}</Text>
               <Text style={[styles.cell, { flex: 1 }]}>{purchase.quantity}</Text>
@@ -61,14 +65,23 @@ const PurchaseList = () => {
   const [selectedSupplier, setSelectedSupplier] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+ 
   // ✅ Unique Supplier Names
-  const uniqueSuppliers = Array.from(new Set(purchases.map(order => order.suppliers_id.name)));
+  const uniqueSuppliers: SupplierInfo[] = Array.from(
+    purchases.reduce((map, order) => {
+      if (order.suppliers_id?._id && order.suppliers_id?.name) {
+        map.set(order.suppliers_id._id, order.suppliers_id.name);
+      }
+      return map;
+    }, new Map<string, string>())
+  ).map(([id, name]) => ({ _id: id, name }));
+  
 
   // ✅ Filtered Products
   const filteredProducts = selectedSupplier
-    ? purchases.filter(order => order.suppliers_id.name === selectedSupplier)
-    : purchases;
+  ? purchases.filter(order => order.suppliers_id?._id === selectedSupplier)
+  : purchases;
+
 
 
     useEffect(() => {
@@ -77,7 +90,7 @@ const PurchaseList = () => {
           setLoading(true); // Show loading while fetching data
           const response = await axios.get("/api/purchase"); // API call
           console.log(response.data);
-          setPurchases(response.data.purchase); // Store fetched purchases
+          setPurchases(response.data.purchase);
         } catch (error: any) {
           console.error("Error fetching purchases:", error);
           setError("Failed to fetch purchases"); // Set error message
@@ -87,6 +100,7 @@ const PurchaseList = () => {
       };
       fetchPurchases();
     }, []);
+    
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -97,18 +111,24 @@ const PurchaseList = () => {
       <h2 className="text-2xl font-semibold mb-4">Purchase List</h2>
       
                  {/* Supplier Dropdown */}
-              <select onChange={(e) => setSelectedSupplier(e.target.value)} value={selectedSupplier}>
-                <option value="">All Suppliers</option>
-                {uniqueSuppliers.map(supplier => (
-                  <option key={supplier} value={supplier}>
-                    {supplier}
-                  </option>
-                ))}
-              </select>
+                 <select onChange={(e) => setSelectedSupplier(e.target.value)} value={selectedSupplier}>
+                  <option value="">All Suppliers</option>
+                  {uniqueSuppliers.map((supplier) => (
+                <option key={supplier._id} value={supplier._id}>
+                  {supplier.name}
+                </option>
+              ))}
+                </select>
 
-              {selectedSupplier && filteredProducts.length > 0 && (
+                {selectedSupplier && filteredProducts.length > 0 && (
               <PDFDownloadLink
-                document={<PurchasePDF supplier={selectedSupplier} products={filteredProducts} />}
+                key={selectedSupplier}  // ✅ Force remount on supplier change
+                document={
+                  <PurchasePDF
+                    supplier={filteredProducts[0]?.suppliers_id?.name || selectedSupplier}
+                    products={filteredProducts}
+                  />
+                }
                 fileName={`purchase_${selectedSupplier}.pdf`}
               >
                 {({ loading }) => (
