@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import {  message } from 'antd';
 interface IAttribute {
@@ -30,9 +30,9 @@ interface SubLevel {
 
 interface CreateProductProps {
   categories: Category[];
-  suppliers: Supplier[];
 }
-const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) => {
+const ProductForm: React.FC<CreateProductProps> = ({ categories }) => {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
   const success = (message: string) => {
     messageApi.open({
@@ -159,7 +159,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
         [name]: isArrayField ? [value] : value, // Wrap in an array only for array fields
       };
     });
-    console.log("Product", product);
+    // console.log("Product", product);
   };
 
   const fetchSubCategories = async (id:string) =>{
@@ -217,6 +217,21 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories, suppliers }) =>
     setProduct(initialProductState);
     
   };
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const response = await axios.get("/api/suppliers"); // API call
+        console.log(response.data);
+        setSuppliers(response.data.supplier);
+      
+      } catch (error: any) {
+        console.error("Error fetching purchases:", error);
+      } finally {
+        console.log("erro")
+      }
+    };
+    fetchSuppliers();
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">

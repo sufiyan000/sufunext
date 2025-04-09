@@ -16,7 +16,7 @@ export default async function Page() {
           },
         ]}
       />
-        <CreateProduct categories={category} suppliers={supplier} />
+        <CreateProduct categories={category} />
       </>
     );
   }
