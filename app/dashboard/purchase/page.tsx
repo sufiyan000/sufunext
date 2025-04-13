@@ -9,7 +9,7 @@ type PurchaseType = {
   price: number;
   quantity: number;
   total: number;
-  purchase_status: "pending" | "completed" | "cancelled";
+  purchase_status: "pending" | "completed";
   suppliers_id: any;
   createdAt: string; // Date ko string ke roop me store karna better hai agar API se aa raha hai
 };
@@ -164,10 +164,29 @@ const PurchaseList = () => {
                 <td className="p-3">{purchase.quantity}</td>
                 <td className="p-3">{purchase.total}</td>
                 <td className={`p-3 font-semibold ${purchase.purchase_status === "completed" ? "text-green-600" : purchase.purchase_status === "pending" ? "text-red-600" : "text-yellow-600"}`}>
-                  <select>
+                <select
+              value={purchase.purchase_status}
+              onChange={async (e) => {
+                const newStatus = e.target.value;
+                if (newStatus === "completed" && purchase.purchase_status !== "completed") {
+                  const confirmed = window.confirm("Are you sure you want to mark this purchase as completed? It will be deleted.");
+                  if (!confirmed) return;
+
+                  try {
+                    const res = await axios.delete(`/api/purchase/completed/${purchase._id}`);
+                    console.log(res.data);
+
+                    // Remove the product from UI
+                    setPurchases((prev) => prev.filter((p) => p._id !== purchase._id));
+                  } catch (err) {
+                    console.error("Error deleting purchase:", err);
+                    alert("Failed to delete the purchase.");
+                  }
+                }
+              }}
+            >
                   <option value={purchase.purchase_status}>Pending</option>
                   <option value="completed" className="text-green-600">Completed</option>
-                  <option value="cancelled" className="text-red-600">Cancelled</option>
                   </select>
                 </td>
               </tr>

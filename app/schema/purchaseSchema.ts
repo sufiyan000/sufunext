@@ -25,7 +25,7 @@ const purchaseSchema = new Schema<IPurchase>(
     total: { type: Number, required: true },
     purchase_status: {
       type: String,
-      enum: ["pending", "completed", "cancelled"],
+      enum: ["pending", "completed"],
       default: "pending",
     },
     suppliers_id: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier", required: true },
