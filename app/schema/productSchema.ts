@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-
+import slugify from "slugify";
 // TypeScript Interface for Dynamic Attributes
 interface IAttribute {
   key: string; // Name of the attribute (e.g., "Size", "Color")
@@ -8,6 +8,7 @@ interface IAttribute {
 // Define the TypeScript interface for the Product model
 export interface IProduct extends Document {
     name: string;
+    slug: string;
     thumbnailUrl: string;
     videoUrl: string;
     brand: string;
@@ -33,6 +34,11 @@ export interface IProduct extends Document {
 // Define the schema for the Product model
 const productSchema = new Schema<IProduct>({
     name: { type: String, required: true },
+    slug: {
+        type: String,
+        required: true,
+        unique: true,
+      },
     thumbnailUrl: { type: String},
     videoUrl: {type: String},
     brand: { type: String, required: true},
@@ -65,6 +71,11 @@ const productSchema = new Schema<IProduct>({
     
 }, {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
+  });
+  productSchema.pre<IProduct>("save", function (next) {
+    if (!this.isModified("name")) return next();
+    this.slug = slugify(this.name, { lower: true, strict: true });
+    next();
   });
 
 // Define and export the Product model

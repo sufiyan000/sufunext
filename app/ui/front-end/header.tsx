@@ -1,49 +1,51 @@
-// Header.jsx
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Search from '@/app/ui/search';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { lusitana } from '@/app/ui/fonts';
+
 const Header = () => {
+  // State for mobile menu and dropdown
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Toggle mobile menu visibility
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
-    <header className="bg-gray-900 text-white sticky p-4">
-      <div className="container h-[50px] mx-auto flex justify-between items-center">
+    <header className="bg-gray-900 text-white sticky top-0 z-50 shadow-md">
+      <div className="container h-[60px] mx-auto flex justify-between items-center px-4 md:px-6">
         {/* Logo */}
         <AcmeLogo />
 
-        {/* Navigation Links */}
-        <nav className="hidden md:flex space-x-6">
-          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
-              Home
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex space-x-8">
+          <Link href="/" className={`${lusitana.className} text-sm font-medium hover:text-[#07f0f0] transition-colors duration-300`}>
+            Home
           </Link>
-          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
-              Shop
+          <Link href="/" className={`${lusitana.className} text-sm font-medium hover:text-[#07f0f0] transition-colors duration-300`}>
+            Shop
           </Link>
-          <Link href="/category" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
-              Category
+          <Link href="/category" className={`${lusitana.className} text-sm font-medium hover:text-[#07f0f0] transition-colors duration-300`}>
+            Category
           </Link>
-          <Link href="/" className={`${lusitana.className} text-sm hover:text-[#07f0f0] `}>
-              Services
+          <Link href="/" className={`${lusitana.className} text-sm font-medium hover:text-[#07f0f0] transition-colors duration-300`}>
+            Services
           </Link>
         </nav>
 
         {/* Search Bar */}
-        <div className="flex items-center space-x-2 text-black">
+        <div className="flex items-center space-x-4">
           <Search placeholder="Search Products..." />
-          {/* <input
-            type="text"
-            placeholder="Search products..."
-            className="px-3 py-1 rounded bg-gray-800 text-sm text-white focus:outline-none"
-          />
-          <button className="bg-[#07f0f0] text-gray-900 px-3 py-1 rounded text-sm">
-            Search
-          </button> */}
         </div>
 
         {/* Icons for Cart and User Account */}
-        <div className="flex items-center space-x-4">
-        <Link href="/" className="text-sm hover:text-[#07f0f0] relative">
-        <svg
+        <div className="flex items-center space-x-6">
+          <Link href="/" className="text-sm hover:text-[#07f0f0] relative">
+            <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
@@ -62,7 +64,7 @@ const Header = () => {
               3
             </span>
           </Link>
-          
+
           <Link href="/login" className="text-sm hover:text-[#07f0f0] relative">
             <svg
               className="w-6 h-6"
@@ -79,12 +81,14 @@ const Header = () => {
               />
             </svg>
           </Link>
-         
         </div>
 
         {/* Mobile Menu Button */}
-        {/* <div className="md:hidden">
-          <button className="text-white focus:outline-none">
+        <div className="md:hidden">
+          <button
+            onClick={toggleMobileMenu}
+            className="text-white focus:outline-none"
+          >
             <svg
               className="w-6 h-6"
               fill="none"
@@ -100,8 +104,29 @@ const Header = () => {
               />
             </svg>
           </button>
-        </div> */}
+        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-gray-800 p-6 space-y-6 transition-transform transform ease-in-out duration-300">
+          <Link href="/" className="block text-white text-lg font-medium hover:text-[#07f0f0]">
+            Home
+          </Link>
+          <Link href="/" className="block text-white text-lg font-medium hover:text-[#07f0f0]">
+            Shop
+          </Link>
+          <Link href="/category" className="block text-white text-lg font-medium hover:text-[#07f0f0]">
+            Category
+          </Link>
+          <Link href="/" className="block text-white text-lg font-medium hover:text-[#07f0f0]">
+            Services
+          </Link>
+          <Link href="/login" className="block text-white text-lg font-medium hover:text-[#07f0f0]">
+            Login
+          </Link>
+        </div>
+      )}
     </header>
   );
 };

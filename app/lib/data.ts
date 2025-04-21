@@ -283,7 +283,7 @@ export async function fetchFilteredProducts(
 
     // Fetching specific fields
     const products = await Product.find(searchCriteria)
-      .select('name thumbnailUrl sku sellingPrice stock brand sellingPrice regularPrice') // Fetch only these fields
+      .select('name slug thumbnailUrl sku sellingPrice stock brand sellingPrice regularPrice') // Fetch only these fields
       .sort({ createdAt: -1 }) 
       .skip(offset)
       .limit(ITEMS_PER_PAGE)
@@ -599,3 +599,95 @@ export async function getSubCategoryById(id: string) {
   await connectMongo();
 }
 
+export async function getProductBySlugUsingAggregate(slug: string) {
+  await connectMongo();
+
+  try {
+    const result = await Product.aggregate([
+      // Match the product by slug
+      { $match: { slug: slug } },
+
+      // Lookup related categories, subCategories, and subLevels
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categories',
+          foreignField: '_id',
+          as: 'categories',
+        },
+      },
+      {
+        $lookup: {
+          from: 'subcategories',
+          localField: 'subCategories',
+          foreignField: '_id',
+          as: 'subCategories',
+        },
+      },
+      {
+        $lookup: {
+          from: 'sublevels',
+          localField: 'subLevels',
+          foreignField: '_id',
+          as: 'subLevels',
+        },
+      },
+
+      // Project transformed fields
+      {
+        $project: {
+          id: { $toString: '$_id' },
+          name: 1,
+          slug: 1,
+          thumbnailUrl: 1,
+          regularPrice: 1,
+          salePrice: '$sellingPrice',
+          images: 1,
+          description: 1,
+          warranty: 1,
+          specifications: {
+            brand: '$brand',
+            model: '$sku',
+          },
+          highlights: {
+            $arrayToObject: {
+              $map: {
+                input: '$attributes',
+                as: 'attr',
+                in: {
+                  k: '$$attr.key',
+                  v: '$$attr.value',
+                },
+              },
+            },
+          },
+          reviews: [
+            {
+              user: 'John Doe',
+              rating: 4,
+              comment: 'Great sound quality and comfortable to wear.',
+            },
+            {
+              user: 'Jane Smith',
+              rating: 5,
+              comment: 'Amazing battery life and noise cancellation!',
+            },
+          ],
+          deliveryInfo: 'Free delivery within 3-5 business days. Cash on Delivery available.',
+        },
+      },
+    ]);
+
+    if (!result.length) {
+      throw new Error('Product not found');
+    }
+
+    return {
+      ...result[0],
+      _id: undefined,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error('Error fetching product by slug');
+  }
+}

@@ -55,7 +55,7 @@ export async function GET(request: Request) {
     await connectMongo();
      
     try{
-        const categories = await Category.find({}, 'name description _id');
+        const categories = await Category.find().sort({ name: 1 });;
         return NextResponse.json({status: "success",statusCode:200,message:"Categories fetched successfully",categories},{status:200});
     }
     catch(err: any) {

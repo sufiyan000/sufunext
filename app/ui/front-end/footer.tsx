@@ -12,7 +12,7 @@ const Footer = () => {
             Faydazone
           </h3>
           <p className="text-sm mb-2">192 Ratnakala building ved raod pandol, surat, India</p>
-          <p className="text-sm mb-2">Email: faydazone67@company.com</p>
+          <p className="text-sm mb-2">Email: faydazone607@gmail.com</p>
           <p className="text-sm mb-2">Phone: +91 9601420947</p>
           <p className="text-sm">Customer Support: +91 8511888678</p>
         </div>
