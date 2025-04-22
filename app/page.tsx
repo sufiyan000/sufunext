@@ -7,8 +7,7 @@ import Pagination from '@/app/ui/dashboard/invoices/pagination';
 import Productshow from '@/app/ui/front-end/showProduct';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchProductPages } from '@/app/lib/data';
-import Category from './ui/front-end/category-showcase';
-
+import FeaturedProducts from './ui/front-end/FeaturedProducts';
 export default async function Page(
   {
     searchParams,
@@ -55,6 +54,7 @@ export default async function Page(
       />
         </div>
       </div>
+      <FeaturedProducts />
        <div className="flex justify-center">
        <p className={`${lusitana.className} text-center text-xl text-gray-800 md:text-3xl md:leading-normal`}>
            All Products

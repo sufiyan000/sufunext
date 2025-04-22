@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import connectMongo from "@/app/lib/mongodb";
+import slugify from 'slugify';
 import Product, { IProduct } from "@/app/schema/productSchema";
 export async function POST(request: Request) {
     await connectMongo();
@@ -21,9 +22,19 @@ export async function POST(request: Request) {
           return NextResponse.json({ error: `Field '${field}' is required.` });
         }
       }
+        // Slug generate karo agar frontend se nahi aaya
+    let baseSlug = slugify(productData.name, { lower: true, strict: true });
+    let uniqueSlug = baseSlug;
+    let counter = 1;
+
+    while (await Product.findOne({ slug: uniqueSlug })) {
+      uniqueSlug = `${baseSlug}-${counter}`;
+      counter++;
+    }
 
       const newProduct: IProduct = new Product({
         ...productData,
+        slug: uniqueSlug,
         categories: productData.categories || [],
         subCategories: productData.subCategories || [],
         subLevels: productData.subLevels || [],
