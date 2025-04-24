@@ -1,12 +1,14 @@
 // models/subSubCategory.ts
 import mongoose, { Schema, Document } from "mongoose";
 
-
+import slugify from "slugify";
 // Interface for SubSubCategory Document
 export interface ISubLevel extends Document {
   name: string;
   description?: string;
   subCategoryId: mongoose.Types.ObjectId; // Reference to the SubCategory model
+  slug?: string;
+  image?: string;
 }
 
 // SubSubCategory Schema
@@ -26,6 +28,15 @@ const SubLevelSchema: Schema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory", // Reference to the SubCategory model
       required: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    image: {
+      type: String,
+      default: '',
     },
   },
   {
