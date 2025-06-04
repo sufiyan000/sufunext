@@ -20,6 +20,45 @@ const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [subLevel, setSubLevel] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [thumbnail, setThumbnail] = useState<string>("");
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setThumbnailFile(file);
+      }
+    };
+  
+    const uploadThumbnail = async () => {
+      if (!thumbnailFile) return;
+  
+      setIsUploading(true);
+  
+      const formData = new FormData();
+      formData.append("file", thumbnailFile);
+  
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await response.json();
+        setThumbnail(data.fileUrl)
+        if (response.ok) {
+          alert("Image uploaded successfully!");
+        } else {
+          alert(data.error || "Failed to upload image.");
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        alert("An error occurred while uploading the image.");
+      } finally {
+        setIsUploading(false);
+      }
+    };
 
   useEffect(() => {
     // Fetch the sub-categories for the selected category
@@ -39,7 +78,7 @@ const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCategory || !selectedSubCategory || !subLevel || !description) {
+    if (!selectedCategory || !selectedSubCategory || !subLevel || !description || !thumbnail) {
       alert("Please fill in all fields.");
       return;
     }
@@ -50,6 +89,7 @@ const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
         subCategoryId: selectedSubCategory,
         name: subLevel,
         description,
+        image: thumbnail,
       };
       const response = await axios.post("/api/sub-levels", data);
       console.log(response);
@@ -73,6 +113,35 @@ const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
         <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
           Add Sub-Level
         </h2>
+        <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Thumbnail Image
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="mb-4 mt-1 block w-full text-sm text-gray-900 bg-gray-50 rounded border border-gray-300"
+                    />
+                    {thumbnailFile && (
+                      <button
+                        type="button"
+                        onClick={uploadThumbnail}
+                        disabled={isUploading}
+                        className={`mt-2 px-4 py-2 rounded ${
+                          isUploading ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"
+                        }`}
+                      >
+                        {isUploading ? "Uploading..." : "Upload Image"}
+                      </button>
+                    )}
+                    {thumbnail && (
+                      <div className="mt-4">
+                        <p className="text-sm text-green-500">Uploaded Image:</p>
+                       <img src={thumbnail}/>
+                      </div>
+                    )}
+                  </div>
         <form onSubmit={handleFormSubmit}>
           {/* Category Selection */}
           <div className="mb-4">

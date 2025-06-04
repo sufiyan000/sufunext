@@ -36,7 +36,6 @@ const SubLevelSchema: Schema = new Schema(
     },
     image: {
       type: String,
-      default: '',
     },
   },
   {

@@ -26,7 +26,7 @@ export default async function ProductsTable({
   
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4 lg:p-8">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 lg:p-8">
       {products.map((product, index) => (
         <div className="" key={index}>
           <Link href={`/products/${product.slug}`}>
@@ -40,7 +40,7 @@ export default async function ProductsTable({
                     width={500}
                     height={500}
                     alt={product.name || 'Product Image'}
-                    className="h-40 w-full object-cover"
+                    className="w-full h-36 object-contain mb-3"
                   />
                 ) : (
                   <div className="h-40 w-full bg-gray-200 flex items-center justify-center">
