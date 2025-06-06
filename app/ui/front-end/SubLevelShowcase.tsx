@@ -25,14 +25,11 @@ const SubLevelShowcase = ({ sublevels }: { sublevels: SubLevel[] }) => {
               key={level._id}
               className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center justify-center transition-transform transform hover:scale-105"
             >
-              {level.image?.trim() && (
-                  <Image
-                    src={level.image}
-                    alt={level.name}
-                    width={100}
-                    height={100}
-                  />
-              )}
+              <img
+              src={level.image || '/logo.png'}
+              alt={level.name}
+              className="w-full h-36 object-contain mb-3"
+            />
               <h3 className={`${lusitana.className} text-xl font-semibold text-gray-700 text-center`}>
                 {level.name}
               </h3>
