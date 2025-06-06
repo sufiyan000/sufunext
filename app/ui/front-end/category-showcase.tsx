@@ -16,20 +16,10 @@ interface Category {
   _id: string;
   name: string;
   slug: string;
+  image: string;
 }
 
-const iconMap: Record<string, React.ElementType> = {
-  "Grocery & Food Items": ShoppingCartIcon,
-  "Home Essentials": HomeIcon,
-  "Personal Care": HeartIcon,
-  "Clothing & Accessories": ShoppingBagIcon,
-  "Electronics & Gadgets": ComputerDesktopIcon,
-  "Health & Wellness": PlusIcon,
-  "Stationery & Office Supplies": BookOpenIcon,
-  "Toys & Kids Items": BookOpenIcon,
-  "Kitchenware & Dining": HomeIcon,
-  "Seasonal & Occasional Items": BookOpenIcon,
-};
+
 
 const CategoryShowcase = ({ categories }: { categories: Category[] }) => {
   return (
@@ -39,14 +29,17 @@ const CategoryShowcase = ({ categories }: { categories: Category[] }) => {
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
         {categories.map((category) => {
-          const Icon = iconMap[category.name] || CubeIcon;
           return (
             <Link
               href={`/category/${category.slug}`}
               key={category._id}
               className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center justify-center transition-transform transform hover:scale-105"
             >
-              <Icon className="h-16 w-16 text-[#07f0f0] mb-4" />
+              <img
+              src={category.image || '/logo.png'}
+              alt={category.name}
+              className="w-full h-36 object-contain mb-3"
+            />
               <h3 className={`${lusitana.className} text-xl font-semibold text-gray-700 text-center`}>
                 {category.name}
               </h3>
