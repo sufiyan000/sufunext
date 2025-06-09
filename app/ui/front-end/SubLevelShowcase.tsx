@@ -9,11 +9,12 @@ interface SubLevel {
   image: string;
 }
 
-const SubLevelShowcase = ({ sublevels,titleData }: { sublevels: SubLevel[],titleData: string; }) => {
+const SubLevelShowcase = ({ sublevels,titleData }: { sublevels: SubLevel[],titleData?: string; }) => {
   return (
     <div className="bg-gray-100 py-8 w-full p-4">
       <h2 className={`${lusitana.className} text-3xl font-bold text-center text-gray-800 mb-4`}>
         {
+          
           titleData? titleData: "Explore Sub-Levels"
         }
       </h2>
