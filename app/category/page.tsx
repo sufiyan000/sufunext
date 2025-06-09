@@ -1,6 +1,6 @@
 import CategoryShowcase from "../ui/front-end/category-showcase";
 
-interface Category {
+interface CategoryData {
   _id: string;
   name: string;
   slug: string;
@@ -13,10 +13,9 @@ export default async function Page() {
   });
 
   const jsonData = await res.json();
-  console.log(jsonData); // Check the structure here
 
   // Access categories properly from response
-  const categories: Category[] = jsonData.categories || [];
+  const categories: CategoryData[] = jsonData.categories || [];
 
   return (
     <CategoryShowcase categories={categories} />
