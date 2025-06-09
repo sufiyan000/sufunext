@@ -8,6 +8,14 @@ import Productshow from '@/app/ui/front-end/showProduct';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchProductPages } from '@/app/lib/data';
 import FeaturedProducts from './ui/front-end/FeaturedProducts';
+import CategoryShowcase from './ui/front-end/category-showcase';
+import SubLevelShowcase from './ui/front-end/SubLevelShowcase';
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  image: string;
+}
 export default async function Page(
   {
     searchParams,
@@ -22,6 +30,20 @@ export default async function Page(
   const currentPage = Number(searchParams?.page) || 1;
 
   const totalPages = await fetchProductPages(query);
+   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`, {
+      cache: 'no-store',
+    });
+
+  const jsonData = await res.json();
+  console.log(jsonData); // Check the structure here
+
+  // Access categories properly from response
+  const categories: Category[] = jsonData.categories || [];
+
+  // sublevel
+
+  const subres = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/sublevels/mobile-phones-and-accessories`);
+  const sublevels = await subres.json();
   return (
     <>
       <Header />
@@ -55,7 +77,14 @@ export default async function Page(
         </div>
       </div>
       <FeaturedProducts />
-       <div className="flex justify-center">
+      <div>
+          <SubLevelShowcase sublevels={sublevels} titleData="Mobile Accessories" />
+      </div>
+      <div>
+        <CategoryShowcase categories={categories} />
+      </div>
+       {/* <div className="flex justify-center">
+        
        <p className={`${lusitana.className} text-center text-xl text-gray-800 md:text-3xl md:leading-normal`}>
            All Products
           </p>
@@ -64,7 +93,7 @@ export default async function Page(
          <Productshow query={query} currentPage={currentPage} />
           <div className="mt-5 flex w-full justify-center mb-4">
               <Pagination totalPages={totalPages} />
-            </div>
+            </div> */}
             <Footer />
       </>
 

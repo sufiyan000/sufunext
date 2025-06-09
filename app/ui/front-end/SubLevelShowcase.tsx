@@ -1,7 +1,6 @@
 "use client";
 import { lusitana } from '@/app/ui/fonts';
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface SubLevel {
   _id: string;
@@ -10,11 +9,13 @@ interface SubLevel {
   image: string;
 }
 
-const SubLevelShowcase = ({ sublevels }: { sublevels: SubLevel[] }) => {
+const SubLevelShowcase = ({ sublevels,titleData }: { sublevels: SubLevel[],titleData: string; }) => {
   return (
     <div className="bg-gray-100 py-8 w-full p-4">
       <h2 className={`${lusitana.className} text-3xl font-bold text-center text-gray-800 mb-4`}>
-        Explore Sub-Levels
+        {
+          titleData? titleData: "Explore Sub-Levels"
+        }
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
         {sublevels.map((level) => {
