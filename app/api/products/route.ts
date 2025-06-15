@@ -87,3 +87,16 @@ export async function PUT(request: Request){
       }
     
 }
+
+
+export async function GET(req: Request) {
+  await connectMongo();
+  const url = new URL(req.url);
+  const search = url.searchParams.get('search') || '';
+
+  const products = await Product.find({
+    name: { $regex: search, $options: 'i' }
+  }).select('name _id sellingPrice stock thumbnailUrl');
+
+  return NextResponse.json(products);
+}
