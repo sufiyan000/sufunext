@@ -3,8 +3,47 @@ import { useState } from 'react';
 import { lusitana } from '@/app/ui/fonts';
 import AddProduct from '@/app/ui/dashboard/invoices/AddProduct';
 import CustomerSelector from '@/app/ui/dashboard/invoices/CustomerSelector';
-import { PDFDownloadLink } from '@react-pdf/renderer';
 import InvoicePDF from '@/app/ui/front-end/InvoicePDF';
+import { pdf } from '@react-pdf/renderer';
+
+const GenerateInvoiceButton = ({
+  customer,
+  products,
+  charges,
+  additionalFields,
+  terms,
+  paymentOption,
+}: any) => {
+  const handleGeneratePDF = async () => {
+    const blob = await pdf(
+      <InvoicePDF
+        customer={customer}
+        products={products}
+        charges={charges}
+        additionalFields={additionalFields}
+        terms={terms}
+        paymentOption={paymentOption}
+      />
+    ).toBlob();
+
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = 'invoice.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <button
+      onClick={handleGeneratePDF}
+      className="mt-6 px-6 py-3 bg-black text-white rounded"
+    >
+      Generate Invoice
+    </button>
+  );
+};
 export default function InvoicePage() {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [selectedProducts, setSelectedProducts] = useState<
@@ -267,31 +306,14 @@ const handleChargeChange = (
         <p className="text-md">Subtotal: ₹{subtotal}</p>
         <p className="text-md">Additional Charges: ₹{totalCharges}</p>
         <p className="text-lg font-bold">Grand Total: ₹{grandTotal}</p>
-              <PDFDownloadLink
-        document={
-          <InvoicePDF
-            customer={selectedCustomer}
-            products={selectedProducts}
-            charges={additionalCharges}
-            additionalFields={additionalFields}
-            terms={terms}
-            paymentOption={paymentOption}
-          />
-        }
-        fileName="invoice.pdf"
-      >
-        {({ loading }) =>
-          loading ? (
-            <button disabled className="mt-6 px-6 py-3 bg-gray-400 text-white rounded">
-              Generating...
-            </button>
-          ) : (
-            <button className="mt-6 px-6 py-3 bg-black text-white rounded">
-              Generate Invoice
-            </button>
-          )
-        }
-      </PDFDownloadLink>
+              <GenerateInvoiceButton
+              customer={selectedCustomer}
+              products={selectedProducts}
+              charges={additionalCharges}
+              additionalFields={additionalFields}
+              terms={terms}
+              paymentOption={paymentOption}
+            />
       </div>
 
     </div>
