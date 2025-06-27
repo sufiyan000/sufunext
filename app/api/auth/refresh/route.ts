@@ -29,8 +29,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate new tokens
-    const newAccessToken = createAccessToken(user);
-    const newRefreshToken = createRefreshToken(user);
+    const newAccessToken = createAccessToken({
+      userId: user._id.toString(),
+      role: user.role,
+      email: user.email,
+    });
+    const newRefreshToken = createRefreshToken({
+      userId: user._id.toString(),
+      
+    });
 
     // Update tokens in DB
     user.tokens = {
