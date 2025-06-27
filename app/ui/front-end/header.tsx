@@ -5,8 +5,12 @@ import Link from 'next/link';
 import Search from '@/app/ui/search';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { lusitana } from '@/app/ui/fonts';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
 
 const Header = () => {
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   // State for mobile menu and dropdown
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -44,7 +48,7 @@ const Header = () => {
 
         {/* Icons for Cart and User Account */}
         <div className="flex items-center space-x-6">
-          <Link href="/" className="text-sm hover:text-[#07f0f0] relative">
+          <Link href="/cart" className="text-sm hover:text-[#07f0f0] relative">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -61,7 +65,7 @@ const Header = () => {
             </svg>
             {/* Cart item count badge */}
             <span className="absolute -top-2 -right-2 bg-[#07f0f0] text-gray-900 rounded-full text-xs w-5 h-5 flex items-center justify-center">
-              3
+              {itemCount}
             </span>
           </Link>
 

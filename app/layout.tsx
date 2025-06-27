@@ -1,6 +1,7 @@
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/fonts';
 import Script from 'next/script';
+import ReduxProvider from './redux/ReduxProvider';
 export const metadata = {
   title: "faydazone.com",
   description: "Welcome to the faydazone official website. Faydey Ki 100% Guarantee",
@@ -29,7 +30,11 @@ export default function RootLayout({
         </Script>
 
       </head>
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${inter.className} antialiased`}>
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
+      </body>
     </html>
   );
 }

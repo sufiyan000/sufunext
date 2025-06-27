@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
 import Image from 'next/image';
 import { calculateDiscountPercentage } from './front-end/showProduct';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '@/app/redux/features/cartSlice';
+import { message } from 'antd';
 
 interface ProductDetailsProps {
   product: {
@@ -27,6 +30,8 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+    const [messageApi, contextHolder] = message.useMessage();
+  const dispatch = useDispatch();
   const [mainImage, setMainImage] = useState(product.thumbnailUrl || '');
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
@@ -38,6 +43,16 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
       setDeliveryMessage('Please enter a valid 6-digit pincode.');
     }
   };
+  const handleAddToCart = () => {
+  dispatch(addToCart({
+    productId: product.id,
+    name: product.name,
+    price: product.salePrice,
+    quantity: 1,
+    thumbnailUrl: product.thumbnailUrl,
+  }));
+  messageApi.success('Product added to cart!');
+};
 
   const handleImageChange = (image: string) => {
     setMainImage(image);
@@ -59,7 +74,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
   
 
   return (
+    
     <div className="container mx-auto py-12 px-4">
+      {contextHolder}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {/* Product Images */}
       <div>
@@ -121,6 +138,13 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           >
            Add To Cart
           </Link>
+          <button
+            onClick={handleAddToCart}
+            className="... your classes ..."
+          >
+            Add To Cart
+          </button>
+          
           <button
             onClick={handleWhatsAppOrder}
             className={`${lusitana.className} w-full flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base mb-4`}

@@ -1,7 +1,9 @@
 'use client';
 import { useState } from 'react';
 import axios from 'axios';
+import { useSession, signOut } from "next-auth/react";
 export default function CustomerForm() {
+  const { data: session, status } = useSession();
   const [billing, setBilling] = useState({
     name: '',
     mobile: '',
@@ -69,10 +71,11 @@ export default function CustomerForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-4 bg-white shadow rounded space-y-4">
-      <h2 className="text-xl font-semibold">Add Customer</h2>
+      <h2 className="text-xl font-semibold">Add Customer {session?.user?.role}</h2>
 
       {/* Billing Address */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
         <input type="text" name="name" placeholder="Customer Name" value={billing.name} onChange={handleBillingChange} className="p-2 border rounded" required />
         <input type="text" name="mobile" placeholder="Mobile Number" value={billing.mobile} onChange={handleBillingChange} className="p-2 border rounded" required />
         <input type="text" name="flat" placeholder="Flat / Building" value={billing.flat} onChange={handleBillingChange} className="p-2 border rounded" required />

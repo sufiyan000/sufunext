@@ -14,25 +14,63 @@ const GenerateInvoiceButton = ({
   terms,
   paymentOption,
 }: any) => {
-  const handleGeneratePDF = async () => {
-    const blob = await pdf(
-      <InvoicePDF
-        customer={customer}
-        products={products}
-        charges={charges}
-        additionalFields={additionalFields}
-        terms={terms}
-        paymentOption={paymentOption}
-      />
-    ).toBlob();
 
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = 'invoice.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleGeneratePDF = async () => {
+    try {
+      // ✅ Step 1: Send invoice to backend
+      const response = await fetch('/api/invoices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerId: customer._id,
+          products: products.map((p: any) => ({
+            productId: p._id,
+             name: p.name,
+            quantity: p.quantity,
+            sellingPrice: p.sellingPrice,
+          })),
+          charges,
+          additionalFields,
+          terms,
+          paymentOption,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Error saving invoice:', data.error);
+        alert('❌ Failed to save invoice. Try again.');
+        return;
+      }
+
+      alert('✅ Invoice saved successfully!');
+
+      // ✅ Step 2: Generate and download PDF
+      const blob = await pdf(
+        <InvoicePDF
+          customer={customer}
+          products={products}
+          charges={charges}
+          additionalFields={additionalFields}
+          terms={terms}
+          paymentOption={paymentOption}
+        />
+      ).toBlob();
+
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'invoice.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('❌ Something went wrong while generating the invoice.');
+    }
   };
 
   return (

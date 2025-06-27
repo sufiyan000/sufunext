@@ -35,7 +35,6 @@ export default async function Page(
     });
 
   const jsonData = await res.json();
-  console.log(jsonData); // Check the structure here
 
   // Access categories properly from response
   const categories: Category[] = jsonData.categories || [];

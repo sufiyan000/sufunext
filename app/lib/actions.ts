@@ -5,6 +5,53 @@ import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import User from '@/app/schema/userSchema';
+import connectMongo from '@/app/lib/mongodb';
+
+const signupSchema = z.object({
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
+  phoneNumber: z.string().min(10).max(10), 
+});
+
+
+
+export async function registerUser(prevState: any, formData: FormData) {
+  const raw = Object.fromEntries(formData.entries());
+  const parsed = signupSchema.safeParse(raw);
+
+  if (!parsed.success) {
+    return 'Please fill all fields correctly.';
+  }
+
+  const { firstName, lastName, email, password,phoneNumber } = parsed.data;
+
+  try {
+    await connectMongo();
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return 'Email already in use.';
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      password, // ✅ Will be hashed in pre-save middleware
+      role: 'User', // default role
+      isEmailVerified: false,
+    });
+
+    await newUser.save();
+
+    return 'success';
+  } catch (err: any) {
+    console.error('Signup error:', err);
+    return 'Something went wrong.';
+  }
+}
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,

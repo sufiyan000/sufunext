@@ -1,14 +1,15 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
-// TypeScript Interface for User
 export interface IUser extends Document {
+  _id: Types.ObjectId | string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   phoneNumber?: string;
-  roles: string[]; // Roles for role-based access control (e.g., "Admin", "User", "Vendor")
-  profilePicture?: string; // URL to the profile picture
+  role: 'User' | 'Admin' | 'Vendor';
+  profilePicture?: string;
   address?: {
     street: string;
     city: string;
@@ -16,31 +17,34 @@ export interface IUser extends Document {
     country: string;
     postalCode: string;
   };
-  isActive: boolean; // User activation status
-  isEmailVerified: boolean; // Email verification status
-  tokens: { 
-    refreshToken?: string; 
-    accessToken?: string; 
-  }; // Authentication tokens
-  preferences?: { 
-    [key: string]: string | number | boolean; 
-  }; // User preferences (e.g., dark mode)
-  metadata?: { 
-    [key: string]: any; 
-  }; // Extra fields for flexibility (e.g., user analytics, integrations)
+  isActive: boolean;
+  isEmailVerified: boolean;
+  tokens: {
+    refreshToken?: string;
+    accessToken?: string;
+  };
+  preferences?: {
+    [key: string]: string | number | boolean;
+  };
+  metadata?: {
+    [key: string]: any;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
 
-// User Schema
+interface IUserModel extends Model<IUser> {
+  comparePassword: (enteredPassword: string, hashedPassword: string) => Promise<boolean>;
+}
+
 const userSchema = new Schema<IUser>(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String, },
+    lastName: { type: String, },
     email: { type: String, unique: true, required: true },
-    password: { type: String, required: true }, // Hashed password
-    phoneNumber: { type: String, unique: true },
-    roles: { type: [String], default: ['User'] }, // Default role is "User"
+    password: { type: String, required: true },
+    phoneNumber: { type: String, },
+    role: { type: String, enum: ['User', 'Admin', 'Vendor'], default: 'User' },
     profilePicture: { type: String },
     address: {
       street: { type: String },
@@ -55,30 +59,31 @@ const userSchema = new Schema<IUser>(
       refreshToken: { type: String },
       accessToken: { type: String },
     },
-    preferences: { type: Map, of: Schema.Types.Mixed }, // Flexible key-value storage
-    metadata: { type: Map, of: Schema.Types.Mixed }, // Advanced metadata support
+    preferences: { type: Map, of: Schema.Types.Mixed },
+    metadata: { type: Map, of: Schema.Types.Mixed },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 
-// Pre-save middleware to hash the password
 userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    const bcrypt = await import('bcryptjs'); // Dynamically import bcryptjs
-    this.password = await bcrypt.hash(this.password, 12); // Hash password with salt
+  const user = this as IUser;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 12);
   }
   next();
 });
 
-// Static method for password comparison
-userSchema.statics.comparePassword = async function (enteredPassword: string, hashedPassword: string) {
-  const bcrypt = await import('bcryptjs');
+userSchema.statics.comparePassword = async function (
+  enteredPassword: string,
+  hashedPassword: string
+) {
   return await bcrypt.compare(enteredPassword, hashedPassword);
 };
 
-// Define and export the User model
-const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
+const User: IUserModel =
+  (mongoose.models?.User as IUserModel) ||
+  mongoose.model<IUser, IUserModel>('User', userSchema);
 
 export default User;
