@@ -1,6 +1,5 @@
 'use server';
-import { signIn } from '@/auth';
-import { AuthError } from 'next-auth';
+
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
@@ -18,58 +17,8 @@ const signupSchema = z.object({
 
 
 
-export async function registerUser(prevState: any, formData: FormData) {
-  const raw = Object.fromEntries(formData.entries());
-  const parsed = signupSchema.safeParse(raw);
 
-  if (!parsed.success) {
-    return 'Please fill all fields correctly.';
-  }
 
-  const { firstName, lastName, email, password,phoneNumber } = parsed.data;
-
-  try {
-    await connectMongo();
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return 'Email already in use.';
-
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      password, // ✅ Will be hashed in pre-save middleware
-      role: 'User', // default role
-      isEmailVerified: false,
-    });
-
-    await newUser.save();
-
-    return 'success';
-  } catch (err: any) {
-    console.error('Signup error:', err);
-    return 'Something went wrong.';
-  }
-}
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  try {
-    await signIn('credentials', formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
-      }
-    }
-    throw error;
-  }
-}
 const FormSchema = z.object({
     id: z.string(),
     customerId: z.string(),
