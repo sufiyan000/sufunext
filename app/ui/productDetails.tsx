@@ -5,11 +5,14 @@ import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/redux/store';
 import Image from 'next/image';
 import { calculateDiscountPercentage } from './front-end/showProduct';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@/app/redux/features/cartSlice';
 import { message } from 'antd';
+import axios from 'axios';
 
 interface ProductDetailsProps {
   product: {
@@ -30,6 +33,8 @@ interface ProductDetailsProps {
 }
 
 const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
+const { accessToken } = useSelector((state: RootState) => state.auth);
+
     const [messageApi, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const [mainImage, setMainImage] = useState(product.thumbnailUrl || '');
@@ -43,16 +48,51 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
       setDeliveryMessage('Please enter a valid 6-digit pincode.');
     }
   };
-  const handleAddToCart = () => {
-  dispatch(addToCart({
-    productId: product.id,
-    name: product.name,
-    price: product.salePrice,
-    quantity: 1,
-    thumbnailUrl: product.thumbnailUrl,
-  }));
-  messageApi.success('Product added to cart!');
+const handleAddToCart = async () => {
+  try {
+    if (accessToken) {
+      // Logged in user
+    await axios.post('/api/cart', {
+      productId: product.id,
+      name: product.name,
+      salePrice: product.salePrice,
+      thumbnailUrl: product.thumbnailUrl,
+      quantity: 1,
+    }, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    } else {
+      // Guest user
+      const guestId = localStorage.getItem('guestId') || crypto.randomUUID();
+      localStorage.setItem('guestId', guestId);
+      await axios.post('/api/guest-cart', {
+        productId: product.id,
+        name: product.name,
+        salePrice: product.salePrice,
+        thumbnailUrl: product.thumbnailUrl,
+        quantity: 1,
+        guestId,
+      });
+    }
+
+    dispatch(addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.salePrice,
+      quantity: 1,
+      thumbnailUrl: product.thumbnailUrl,
+    }));
+
+    messageApi.success('Product added to cart!');
+  } catch (error) {
+    console.error(error);
+    messageApi.error('Failed to add to cart');
+  }
 };
+
+
 
   const handleImageChange = (image: string) => {
     setMainImage(image);
@@ -132,15 +172,11 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
           </span>
         </div>
        
-        <Link
-            href="/"
-            className={`${lusitana.className} flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base mb-4`}
-          >
-           Add To Cart
-          </Link>
+        
           <button
+            className={`${lusitana.className} w-full flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base mb-4`}
             onClick={handleAddToCart}
-            className="... your classes ..."
+            
           >
             Add To Cart
           </button>

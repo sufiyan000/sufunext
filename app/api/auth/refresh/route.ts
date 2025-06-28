@@ -1,67 +1,39 @@
+// ✅ Backend: /api/auth/refresh
+
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import connectMongo from '@/app/lib/mongodb';
+import { verifyRefreshToken, createAccessToken } from '@/app/lib/jwt';
 import User from '@/app/schema/userSchema';
-import { createAccessToken, createRefreshToken } from '@/app/lib/jwt';
+import connectMongo from '@/app/lib/mongodb';
 import { cookies } from 'next/headers';
 
-const REFRESH_SECRET = process.env.REFRESH_SECRET!;
-
 export async function POST(req: NextRequest) {
+  await connectMongo();
+  const refreshToken = req.cookies.get('refreshToken')?.value;
+  if (!refreshToken) {
+    return NextResponse.json({ error: 'No refresh token' }, { status: 401 });
+  }
+
   try {
-    await connectMongo();
-
-    // Get refresh token from cookies
-    const cookieStore = cookies();
-    const refreshToken = cookieStore.get('refreshToken')?.value;
-
-    if (!refreshToken) {
-      return NextResponse.json({ error: 'No refresh token provided' }, { status: 401 });
-    }
-
-    // Verify refresh token
-    const decoded: any = jwt.verify(refreshToken, REFRESH_SECRET);
-
-    // Find user with that token
+    const decoded: any = verifyRefreshToken(refreshToken);
     const user = await User.findById(decoded.userId);
-    if (!user || user.tokens.refreshToken !== refreshToken) {
-      return NextResponse.json({ error: 'Invalid refresh token' }, { status: 403 });
-    }
+    if (!user) throw new Error('User not found');
 
-    // Generate new tokens
     const newAccessToken = createAccessToken({
       userId: user._id.toString(),
       role: user.role,
       email: user.email,
     });
-    const newRefreshToken = createRefreshToken({
-      userId: user._id.toString(),
-      
-    });
 
-    // Update tokens in DB
-    user.tokens = {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
-    await user.save();
-
-    // Set new refresh token in cookie
-    cookies().set('refreshToken', newRefreshToken, {
+    cookies().set('accessToken', newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 60 * 15,
     });
 
-    // Return new access token
-    return NextResponse.json({
-      message: 'Token refreshed',
-      accessToken: newAccessToken,
-    });
-  } catch (err: any) {
-    console.error('Refresh token error:', err);
-    return NextResponse.json({ error: 'Invalid or expired refresh token' }, { status: 403 });
+    return NextResponse.json({ accessToken: newAccessToken });
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid refresh token' }, { status: 401 });
   }
 }
