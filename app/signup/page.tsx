@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/app/redux/store';
 import { loginSuccess } from '@/app/redux/features/authSlice';
-import axios from '@/app/lib/axios';
-
+import axios from 'axios';
 export default function SignupPage() {
   const router = useRouter();
   const dispatch: AppDispatch = useDispatch();

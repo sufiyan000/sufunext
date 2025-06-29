@@ -1,84 +1,115 @@
-"use client";
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/redux/store';
 import { message } from 'antd';
 
-export default function CheckoutForm({ cart }: { cart: any, onCartUpdate: (updatedCart: any) => void }) {
+interface CartItem {
+  productId: string;
+  name: string;
+  salePrice: number;
+  quantity: number;
+  thumbnailUrl?: string;
+  attributes?: Record<string, any>;
+}
+
+interface FormState {
+  name: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  paymentMethod: 'COD' | 'CreditCard' | 'DebitCard' | 'UPI' | 'PayPal';
+}
+
+interface CheckoutFormProps {
+  cart: { items: CartItem[] };
+  onCartUpdate?: (updatedCart: CartItem[]) => void;
+}
+
+export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) {
   const { accessToken } = useSelector((state: RootState) => state.auth);
   const [messageApi, contextHolder] = message.useMessage();
-  const [form, setForm] = useState({ name: '', phone: '', address: '', paymentMethod: 'COD' });
-  const [items, setItems] = useState(cart.items);
+  const [form, setForm] = useState<FormState>({
+    name: '', phone: '', addressLine1: '', addressLine2: '', city: '', state: '', country: '', postalCode: '', paymentMethod: 'COD'
+  });
+  const [items, setItems] = useState<CartItem[]>(cart.items || []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [e.target.name]: e.target.value });
+  const increment = (index: number) => setItems(prev => prev.map((item, i) => i === index ? { ...item, quantity: item.quantity + 1 } : item));
+  const decrement = (index: number) => setItems(prev => prev.map((item, i) => i === index && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item));
 
- const increment = async (index: number) => {
-  const updated = [...items];
-  updated[index].quantity += 1;
-  setItems(updated);
-  await updateQuantity(updated[index].productId, updated[index].quantity);
-};
-
-const decrement = async (index: number) => {
-  const updated = [...items];
-  if (updated[index].quantity > 1) {
-    updated[index].quantity -= 1;
-    setItems(updated);
-    await updateQuantity(updated[index].productId, updated[index].quantity);
-  }
-};
-
-const updateQuantity = async (productId: string, quantity: number) => {
-  try {
-    await axios.patch('/api/cart', { productId, quantity }, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    messageApi.success('Cart updated');
-  } catch (error) {
-    console.error(error);
-    messageApi.error('Failed to update cart');
-  }
-};
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // TODO: POST to /api/orders
+    const totalCost = items.reduce((acc, item) => acc + item.quantity * item.salePrice, 0);
+    const orderPayload = {
+      orderItems: items.map(item => ({ ...item, total: item.quantity * item.salePrice })),
+      shippingAddress: { ...form },
+      paymentMethod: form.paymentMethod,
+      shippingCost: 0,
+      totalCost,
+      status: 'Pending' as const,
+    };
+  
+    try {
+      await axios.post('/api/orders', orderPayload, { headers: { Authorization: `Bearer ${accessToken}` } });
+      messageApi.success('Order placed successfully');
+      if (onCartUpdate) onCartUpdate([]);
+      setItems([]);
+      window.location.href = '/order-confirmation';
+    } catch (error) {
+      console.error(error);
+      messageApi.error('Failed to place order');
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded shadow max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Billing Details</h2>
-      <input className="w-full border p-2 rounded" type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-      <input className="w-full border p-2 rounded" type="text" name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} required />
-      <input className="w-full border p-2 rounded" type="text" name="address" placeholder="Address" value={form.address} onChange={handleChange} required />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto p-4">
+      {contextHolder}
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
+        <h2 className="text-2xl font-bold">Billing Details</h2>
+        <input className="w-full border p-2 rounded" type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
+        <input className="w-full border p-2 rounded" type="text" name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} required />
+        <input className="w-full border p-2 rounded" type="text" name="addressLine1" placeholder="Address Line 1" value={form.addressLine1} onChange={handleChange} required />
+        <input className="w-full border p-2 rounded" type="text" name="addressLine2" placeholder="Address Line 2" value={form.addressLine2} onChange={handleChange} />
+        <input className="w-full border p-2 rounded" type="text" name="city" placeholder="City" value={form.city} onChange={handleChange} required />
+        <input className="w-full border p-2 rounded" type="text" name="state" placeholder="State" value={form.state} onChange={handleChange} required />
+        <input className="w-full border p-2 rounded" type="text" name="country" placeholder="Country" value={form.country} onChange={handleChange} required />
+        <input className="w-full border p-2 rounded" type="text" name="postalCode" placeholder="Postal Code" value={form.postalCode} onChange={handleChange} required />
+        <select className="w-full border p-2 rounded" name="paymentMethod" value={form.paymentMethod} onChange={handleChange}>
+          <option value="COD">Cash on Delivery</option>
+          <option value="CreditCard">Credit Card</option>
+          <option value="DebitCard">Debit Card</option>
+          <option value="UPI">UPI</option>
+          <option value="PayPal">PayPal</option>
+        </select>
+        <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded">Place Order</button>
+      </form>
 
-      <h2 className="text-xl font-bold mb-4">Payment Method</h2>
-      <select className="w-full border p-2 rounded" name="paymentMethod" value={form.paymentMethod} onChange={handleChange}>
-        <option value="COD">Cash on Delivery</option>
-        <option value="Online">Online Payment</option>
-      </select>
-
-      <h2 className="text-xl font-bold mb-4">Your Cart</h2>
-      <ul className="space-y-2">
-        {items.map((item: any, index: number) => (
-          <li key={item.id} className="flex items-center justify-between border p-2 rounded">
-            <img src={item.thumbnailUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
-            <span className="flex-1 ml-4">{item.name}</span>
-            <div className="flex items-center space-x-2">
-              <button type="button" onClick={() => decrement(index)} className="px-2 py-1 bg-gray-300 rounded">-</button>
-              <span>{item.quantity}</span>
-              <button type="button" onClick={() => increment(index)} className="px-2 py-1 bg-gray-300 rounded">+</button>
+      <div className="bg-white p-4 rounded shadow space-y-4">
+        <h2 className="text-2xl font-bold">Your Cart</h2>
+        {items.map((item, index) => (
+          <div key={item.productId} className="flex items-center justify-between border p-2 rounded gap-4">
+            <img src={item.thumbnailUrl || '/placeholder.png'} alt={item.name} className="w-16 h-16 object-cover rounded" />
+            <div className="flex-1">
+              <h3 className="font-semibold">{item.name}</h3>
+              <p className="text-sm text-gray-600">Price: ₹{item.salePrice}</p>
+              <p className="text-sm text-gray-600">Subtotal: ₹{item.salePrice * item.quantity}</p>
+              <div className="flex items-center space-x-2 mt-2">
+                <button type="button" onClick={() => decrement(index)} className="px-2 py-1 bg-gray-300 rounded">-</button>
+                <span>{item.quantity}</span>
+                <button type="button" onClick={() => increment(index)} className="px-2 py-1 bg-gray-300 rounded">+</button>
+              </div>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
-
-      <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded mt-4">Place Order</button>
-    </form>
+        <div className="text-right font-bold text-xl border-t pt-4">Total: ₹{items.reduce((acc, item) => acc + item.quantity * item.salePrice, 0)}</div>
+      </div>
+    </div>
   );
 }
