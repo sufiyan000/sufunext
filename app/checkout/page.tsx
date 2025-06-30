@@ -10,12 +10,12 @@ export default async function CheckoutPage() {
     redirect('/login');
   }
 
-  const res = await fetch('http://localhost:3000/api/cart', {
-    cache: 'no-store',
-    headers: {
-      Cookie: `accessToken=${token.value}`,
-    },
-  });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cart`, {
+  cache: 'no-store',
+  headers: {
+    Cookie: `accessToken=${token.value}`,
+  },
+});
 
   const cartData = await res.json();
 
