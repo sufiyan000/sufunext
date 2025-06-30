@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import {  message } from 'antd';
 interface IAttribute {
   key: string;
@@ -164,7 +164,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories }) => {
 
   const fetchSubCategories = async (id:string) =>{
         try {
-          const response = await axios.get(`/api/sub-category/${id}`);
+          const response = await api.get(`/api/sub-category/${id}`);
           setSubCategories(response.data.subCategorys);
         } catch (error) {
           console.error("Error fetching sub-categories:", error);
@@ -174,7 +174,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories }) => {
   
   const fetchSubLevel = async (id:string) =>{
     try {
-      const response = await axios.get(`/api/sub-levels/${id}`);
+      const response = await api.get(`/api/sub-levels/${id}`);
       setSubLevels(response.data.subLevels);
       
     } catch (error) {
@@ -212,7 +212,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories }) => {
     e.preventDefault();
     console.log("Submitting Product:", product);
     // Add logic to send data to your API
-    const response = await axios.post('/api/products', product);
+    const response = await api.post('/api/products', product);
     success(response.data.message);
     setProduct(initialProductState);
     
@@ -220,7 +220,7 @@ const ProductForm: React.FC<CreateProductProps> = ({ categories }) => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await axios.get("/api/suppliers"); // API call
+        const response = await api.get("/api/suppliers"); // API call
         console.log(response.data);
         setSuppliers(response.data.supplier);
       

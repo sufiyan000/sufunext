@@ -1,6 +1,6 @@
 import { sql } from '@vercel/postgres';
 import mongoose from 'mongoose';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import {
   CustomerField,
   CustomersTableType,
@@ -233,7 +233,7 @@ export async function fetchFilteredCustomers(query: string) {
 
 export async function fetchSuppliers() {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/suppliers`);
+    const response = await api.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/suppliers`);
     return response.data.supplier;
     
   } catch (error) {
@@ -243,7 +243,7 @@ export async function fetchSuppliers() {
 }
 export async function fetchCategory() {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
+    const response = await api.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/category`);
     return response.data.categories;
     
   } catch (error) {
@@ -254,7 +254,7 @@ export async function fetchCategory() {
 
 export async function fetchSubCategory(id:string) {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/sub-category/${id}`);
+    const response = await api.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/sub-category/${id}`);
     return response.data.categories;
     
   } catch (error) {

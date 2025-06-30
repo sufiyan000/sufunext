@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 export default function CustomerForm() {
   const [billing, setBilling] = useState({
     name: '',
@@ -54,7 +54,7 @@ export default function CustomerForm() {
     console.log("Customer Data:", customerData);
     // POST to API here
     try {
-    const res = await axios.post('/api/customers', customerData);
+    const res = await api.post('/api/customers', customerData);
     if (res.data.success) {
       alert('Customer added successfully!');
       // Optionally reset form here

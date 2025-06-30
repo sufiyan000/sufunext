@@ -9,7 +9,7 @@ import {
     PlusCircleIcon,
      XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import axios from "axios";
+import api from '@/app/lib/axiosClient';
 
 
 export function CreateProduct() {
@@ -68,7 +68,7 @@ export function Purchase({ id }: { id: string }) {
   const decreaseQuantity = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
   const purchaseProduct = async () => {
     try {
-      const response = await axios.post(`/api/purchase`, {
+      const response = await api.post(`/api/purchase`, {
         quantity,
         id,
       });

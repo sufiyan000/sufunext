@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 
 export default function CustomerSelector({ onSelect }: { onSelect: (customer: any) => void }) {
   const [query, setQuery] = useState('');
@@ -9,7 +9,7 @@ export default function CustomerSelector({ onSelect }: { onSelect: (customer: an
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (query.length > 2) {
-        axios.get(`/api/customers?search=${query}`).then(res => setSuggestions(res.data));
+        api.get(`/api/customers?search=${query}`).then(res => setSuggestions(res.data));
       } else {
         setSuggestions([]);
       }

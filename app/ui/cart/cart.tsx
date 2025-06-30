@@ -2,6 +2,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/app/redux/store';
 import { incrementQuantity, decrementQuantity, removeFromCart, clearCart } from '@/app/redux/features/cartSlice';
+import Link from 'next/link';
 
 export default function CartPage() {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ export default function CartPage() {
           </div>
           <div className="mt-8 border-t pt-4">
             <p className="text-xl font-bold mb-4">Subtotal: ₹{subtotal}</p>
-            <button onClick={() => alert('Proceeding to checkout...')} className="px-6 py-2 bg-[#07f0f0] text-black rounded hover:bg-[#05d6d6]">Proceed to Checkout</button>
+            <Link href={"/checkout"} className="px-6 py-2 bg-[#07f0f0] text-black rounded hover:bg-[#05d6d6]">Proceed to Checkout</Link>
           </div>
         </>
       )}

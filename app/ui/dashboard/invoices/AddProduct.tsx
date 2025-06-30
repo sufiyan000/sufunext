@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 
 interface Product {
   _id: string;
@@ -28,7 +28,7 @@ export default function AddProduct({
   // Fetch products once
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await axios.get('/api/products'); // Ensure this route works
+      const res = await api.get('/api/products'); // Ensure this route works
       setProducts(res.data);
     };
     fetchProducts();

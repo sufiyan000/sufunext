@@ -35,7 +35,6 @@ export interface IOrder extends Document {
     postalCode: string;
   };
   paymentMethod: 'COD' | 'CreditCard' | 'DebitCard' | 'UPI' | 'PayPal'; // Available payment methods
-  transactionId?: string; // Unique transaction ID for online payments
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Returned'; // Order status
   shippingCost: number; // Cost of shipping
   totalCost: number; // Grand total (items + shipping - discounts)
@@ -82,7 +81,6 @@ const orderSchema = new Schema<IOrder>(
       postalCode: { type: String },
     },
     paymentMethod: { type: String, enum: ['COD', 'CreditCard', 'DebitCard', 'UPI', 'PayPal'], required: true },
-    transactionId: { type: String, unique: true },
     status: {
       type: String,
       enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],

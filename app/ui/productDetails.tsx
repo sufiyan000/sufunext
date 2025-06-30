@@ -12,7 +12,7 @@ import { calculateDiscountPercentage } from './front-end/showProduct';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@/app/redux/features/cartSlice';
 import { message } from 'antd';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 
 interface ProductDetailsProps {
   product: {
@@ -52,7 +52,7 @@ const handleAddToCart = async () => {
   try {
     if (accessToken) {
       // Logged in user
-    await axios.post('/api/cart', {
+    await api.post('/api/cart', {
       productId: product.id,
       name: product.name,
       salePrice: product.salePrice,
@@ -67,7 +67,7 @@ const handleAddToCart = async () => {
       // Guest user
       const guestId = localStorage.getItem('guestId') || crypto.randomUUID();
       localStorage.setItem('guestId', guestId);
-      await axios.post('/api/guest-cart', {
+      await api.post('/api/guest-cart', {
         productId: product.id,
         name: product.name,
         salePrice: product.salePrice,

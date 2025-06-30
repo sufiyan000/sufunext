@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/app/redux/store';
 import { loginSuccess } from '@/app/redux/features/authSlice';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function LoginPage() {
       if (user.role === 'Admin') {
         router.push('/dashboard');
       } else if (user.role === 'User') {
-        router.push('/accounts');
+        router.push('/');
       }
     }
   }, [user, accessToken]);
@@ -38,7 +38,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await axios.post('/api/auth/login', form);
+      const res = await api.post('/api/auth/login', form);
       const data = res.data;
 
       dispatch(
@@ -52,7 +52,7 @@ export default function LoginPage() {
       if (data.user.role === 'Admin') {
         router.push('/dashboard');
       } else if (data.user.role === 'User') {
-        router.push('/accounts');
+        router.push('/');
       } else {
         router.push('/unauthorized');
       }

@@ -10,6 +10,7 @@ import { RootState } from '@/app/redux/store';
 
 const Header = () => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
+  const { user } = useSelector((state: RootState) => state.auth);
   const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   // State for mobile menu and dropdown
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -69,7 +70,11 @@ const Header = () => {
             </span>
           </Link>
 
-          <Link href="/login" className="text-sm hover:text-[#07f0f0] relative">
+        
+          {user ? (
+            <Link href={"/accounts"}>Welcome, {user.firstName}</Link>
+          ) : (
+            <Link href="/login" className="text-sm hover:text-[#07f0f0] relative">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -85,6 +90,7 @@ const Header = () => {
               />
             </svg>
           </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}

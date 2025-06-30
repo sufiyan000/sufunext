@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Image} from '@react-pdf/renderer';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 type PurchaseType = {
   _id: string;
   product_image: string;
@@ -88,7 +88,7 @@ const PurchaseList = () => {
       const fetchPurchases = async () => {
         try {
           setLoading(true); // Show loading while fetching data
-          const response = await axios.get("/api/purchase"); // API call
+          const response = await api.get("/api/purchase"); // API call
           console.log(response.data);
           setPurchases(response.data.purchase);
         } catch (error: any) {
@@ -173,7 +173,7 @@ const PurchaseList = () => {
                   if (!confirmed) return;
 
                   try {
-                    const res = await axios.delete(`/api/purchase/completed/${purchase._id}`);
+                    const res = await api.delete(`/api/purchase/completed/${purchase._id}`);
                     console.log(res.data);
 
                     // Remove the product from UI

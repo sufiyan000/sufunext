@@ -32,7 +32,15 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 15,
     });
 
-    return NextResponse.json({ accessToken: newAccessToken });
+    return NextResponse.json({ 
+      accessToken: newAccessToken, 
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      }
+    });
   } catch (err) {
     return NextResponse.json({ error: 'Invalid refresh token' }, { status: 401 });
   }

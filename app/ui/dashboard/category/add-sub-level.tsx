@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from '@/app/lib/axiosClient';
 interface Category {
   _id: string;
   name: string;
@@ -65,7 +65,7 @@ const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
     const fetchSubCategories = async () => {
       if (selectedCategory) {
         try {
-          const response = await axios.get(`/api/sub-category/${selectedCategory}`);
+          const response = await api.get(`/api/sub-category/${selectedCategory}`);
           setSubCategory(response.data.subCategorys || []);
         } catch (error) {
           console.error("Error fetching sub-categories:", error);
@@ -91,7 +91,7 @@ const AddSubLevelForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
         description,
         image: thumbnail,
       };
-      const response = await axios.post("/api/sub-levels", data);
+      const response = await api.post("/api/sub-levels", data);
       console.log(response);
 
       if (response.data.status === "success") {

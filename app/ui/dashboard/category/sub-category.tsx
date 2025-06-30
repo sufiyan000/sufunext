@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import axios from "axios";
+import api from '@/app/lib/axiosClient';
 interface Category {
   _id: string;
   name: string;
@@ -30,7 +30,7 @@ const AddSubCategoryForm: React.FC<AddSubCategoryFormProps> = ({category}) => {
         name: subCategory,
         description,
       }
-      const response = await axios.post("/api/sub-category", data);
+      const response = await api.post("/api/sub-category", data);
 
       if (response.data.status === "success") {
         alert("Sub-category added successfully!");

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import {  message } from 'antd';
 
 interface Supplier {
@@ -53,7 +53,7 @@ export default function SupplierManager() {
       website: formData.website,
 
     }
-      const response = await axios.post('/api/suppliers', data);
+      const response = await api.post('/api/suppliers', data);
       success(response.data.message);
     const newSupplier: Supplier = {
       ...formData,

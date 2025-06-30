@@ -19,7 +19,7 @@ export default function ClientOnlyLayout({ children }: { children: React.ReactNo
     }
 
     if (auth.user && auth.accessToken && auth.user.role !== 'User') {
-      router.push('/unauthorized');
+      router.push('/login');
       return;
     }
 

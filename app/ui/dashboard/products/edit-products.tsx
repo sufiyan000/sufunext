@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect} from "react";
 import {  message } from 'antd';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import Image from "next/image";
 import { redirect } from "next/navigation";
 interface Attribute {
@@ -60,7 +60,7 @@ const EditProductPage: React.FC<EditProductPageProps> = ({ product }) => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await axios.get("/api/suppliers");
+        const response = await api.get("/api/suppliers");
         console.log(response.data.supplier);
         setSuppliers(response.data.supplier); // Ensure response.data contains an array
       } catch (error) {
@@ -94,7 +94,7 @@ const EditProductPage: React.FC<EditProductPageProps> = ({ product }) => {
       };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await axios.put('/api/products', newProduct);
+    const response = await api.put('/api/products', newProduct);
     console.log("Submitting Product:", response);
     success(response.data.message);
     

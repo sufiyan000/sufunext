@@ -1,6 +1,6 @@
 // Frontend logout function example:
 
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/app/redux/features/authSlice';
 
@@ -8,7 +8,7 @@ export default function LogoutButton() {
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
-    await axios.post('/api/auth/logout');
+    await api.post('/api/auth/logout');
     dispatch(logout());
     window.location.href = '/login';
   };

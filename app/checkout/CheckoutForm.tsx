@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/redux/store';
 import { message } from 'antd';
@@ -57,7 +57,7 @@ export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) 
     };
   
     try {
-      await axios.post('/api/orders', orderPayload, { headers: { Authorization: `Bearer ${accessToken}` } });
+      await api.post('/api/orders', orderPayload, { headers: { Authorization: `Bearer ${accessToken}` } });
       messageApi.success('Order placed successfully');
       if (onCartUpdate) onCartUpdate([]);
       setItems([]);

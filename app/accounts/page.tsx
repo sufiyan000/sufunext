@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 
 interface User {
   firstName: string;
@@ -19,7 +19,7 @@ export default function AccountsOverview() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('/api/user/me', { withCredentials: true });
+        const res = await api.get('/api/user/me', { withCredentials: true });
         setUser(res.data.user);
       } catch (err: any) {
         setError(err.response?.data?.error || 'Failed to load user data');

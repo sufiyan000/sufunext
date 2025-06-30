@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Modal, Form, Input,  Popconfirm, message } from 'antd';
 import { Button } from '../../button';
 
-import axios from 'axios';
+import api from '@/app/lib/axiosClient';
 import Link from 'next/link';
 interface Category {
   _id: string;
@@ -19,7 +19,7 @@ const AddCategoryForm: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/category');
+        const response = await api.get('/api/category');
         setCategories(response.data.categories); // Adjust based on your API response
       } catch (error) {
         message.error('Failed to fetch categories');
@@ -31,7 +31,7 @@ const AddCategoryForm: React.FC = () => {
  
   const handleDeleteCategory = async (categoryId: string) => {
     try {
-      await axios.delete(`/api/category/${categoryId}`);
+      await api.delete(`/api/category/${categoryId}`);
       setCategories(categories.filter((cat) => cat._id !== categoryId));
       message.success('Category deleted successfully');
     } catch (error) {
