@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!accessToken || !user) {
       router.push('/login');
     } else if (user.role !== 'Admin') {
-      router.push('/unauthorized');
+      router.push('/login');
     }
   }, [user, accessToken]);
 
