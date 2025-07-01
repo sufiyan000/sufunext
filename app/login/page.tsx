@@ -16,8 +16,10 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false); // ✅ For resend button
+  const [resendSuccess, setResendSuccess] = useState('');
+  
 
-  // ✅ Redirect if already logged in
   useEffect(() => {
     if (user && accessToken) {
       if (user.role === 'Admin') {
@@ -36,19 +38,15 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setShowResend(false);
+    setResendSuccess('');
 
     try {
       const res = await api.post('/api/auth/login', form);
       const data = res.data;
 
-      dispatch(
-        loginSuccess({
-          accessToken: data.accessToken,
-          user: data.user,
-        })
-      );
+      dispatch(loginSuccess({ accessToken: data.accessToken, user: data.user }));
 
-      // ✅ Redirect based on role
       if (data.user.role === 'Admin') {
         router.push('/dashboard');
       } else if (data.user.role === 'User') {
@@ -57,9 +55,29 @@ export default function LoginPage() {
         router.push('/unauthorized');
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      const msg = err.response?.data?.message || 'Login failed';
+
+      // ✅ Show resend option if not verified
+      if (msg === 'Please verify your email first') {
+        setShowResend(true);
+        setError('⚠️ Please verify your email. Didn\'t receive the link?');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ✅ Resend verification email handler
+  const handleResendVerification = async () => {
+    setResendSuccess('');
+    setError('');
+    try {
+      await api.post('/api/auth/resend-verification', { email: form.email });
+      setResendSuccess('✅ Verification email sent successfully.');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to resend verification email.');
     }
   };
 
@@ -83,7 +101,24 @@ export default function LoginPage() {
           onChange={handleChange}
           required
         />
+
+        {/* ✅ Error Message */}
         {error && <p className="text-red-500 text-sm">{error}</p>}
+
+        {/* ✅ Resend Verification Email */}
+        {showResend && (
+          <button
+            type="button"
+            onClick={handleResendVerification}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Resend Verification Email
+          </button>
+        )}
+
+        {/* ✅ Resend Success Message */}
+        {resendSuccess && <p className="text-green-600 text-sm">{resendSuccess}</p>}
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
@@ -93,8 +128,11 @@ export default function LoginPage() {
         </button>
       </form>
       <p className="mt-4 text-center text-sm">
-      Don't have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign up</a>
-    </p>
+        Don't have an account?{' '}
+        <a href="/signup" className="text-blue-600 hover:underline">
+          Sign up
+        </a>
+      </p>
     </div>
   );
 }

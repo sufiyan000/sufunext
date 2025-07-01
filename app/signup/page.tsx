@@ -19,6 +19,8 @@ export default function SignupPage() {
   });
 
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,18 +30,20 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
       const res = await axios.post('/api/auth/signup', form);
       const data = res.data;
-
       dispatch(
         loginSuccess({
           accessToken: data.accessToken,
           user: data.user,
         })
       );
+      setSuccess(data.message || 'Signup successful! Please verify your email.');
+      setTimeout(() => router.push('/login'), 2000); // redirect after 2 sec
 
       router.push('/dashboard');
     } catch (err: any) {
@@ -89,7 +93,9 @@ export default function SignupPage() {
           onChange={handleChange}
           required
         />
+        {success && <p className="text-green-600 text-sm mb-2">{success}</p>}
         {error && <p className="text-red-500 text-sm">{error}</p>}
+        
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
