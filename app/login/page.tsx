@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/app/redux/store';
 import { loginSuccess } from '@/app/redux/features/authSlice';
 import api from '@/app/lib/axiosClient';
+import Header from '../ui/front-end/header';
+import Footer from '../ui/front-end/footer';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -82,6 +84,8 @@ export default function LoginPage() {
   };
 
   return (
+    <div>
+      <Header />
     <div className="max-w-md mx-auto mt-20 p-6 bg-white shadow-md rounded-md">
       <h2 className="text-2xl font-bold mb-6">Login</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -133,6 +137,9 @@ export default function LoginPage() {
           Sign up
         </a>
       </p>
+    </div>
+    <Footer />
+
     </div>
   );
 }

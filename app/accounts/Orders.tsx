@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/app/lib/axiosClient';
+import { PDFDownloadLink, Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
 interface OrderItem {
   name: string;
   quantity: number;
   price: number;
   total: number;
+  
   attributes?: Record<string, string | number | boolean>;
 }
 
@@ -18,6 +20,42 @@ interface Order {
   totalCost: number;
   createdAt: string;
   paymentMethod: string;
+}
+
+const styles = StyleSheet.create({
+  page: { padding: 20, fontSize: 12 },
+  section: { marginBottom: 10 },
+  header: { fontSize: 16, marginBottom: 10, fontWeight: 'bold' },
+  item: { marginBottom: 5 },
+  footer: { marginTop: 10, borderTop: '1px solid #ccc', paddingTop: 5 }
+});
+
+function Invoice({ order }: { order: Order }) {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.header}>Invoice - Order ID: {order._id}</Text>
+          <Text>Date: {new Date(order.createdAt).toLocaleDateString()}</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.header}>Items</Text>
+          {order.orderItems.map((item, idx) => (
+            <Text key={idx} style={styles.item}>
+              {item.name} × {item.quantity} = ₹{item.total.toFixed(2)}
+            </Text>
+          ))}
+        </View>
+
+        <View style={styles.footer}>
+          <Text>Total: ₹{order.totalCost.toFixed(2)}</Text>
+          <Text>Payment Method: {order.paymentMethod}</Text>
+          <Text>Status: {order.status}</Text>
+        </View>
+      </Page>
+    </Document>
+  );
 }
 
 export default function OrdersPage() {
@@ -71,6 +109,13 @@ export default function OrdersPage() {
             <div className="text-right text-sm">
               <p><strong>Total:</strong> ₹{order.totalCost.toFixed(2)}</p>
               <p><strong>Payment:</strong> {order.paymentMethod}</p>
+              <PDFDownloadLink
+                document={<Invoice order={order} />}
+                fileName={`invoice-${order._id}.pdf`}
+                className="text-blue-600 underline mt-2 inline-block"
+              >
+                {({ loading }) => (loading ? 'Generating PDF...' : 'Download Invoice')}
+              </PDFDownloadLink>
             </div>
           </div>
         ))}

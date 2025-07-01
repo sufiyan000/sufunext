@@ -10,13 +10,16 @@ export interface IUser extends Document {
   phoneNumber?: string;
   role: 'User' | 'Admin' | 'Vendor';
   profilePicture?: string;
-  address?: {
-    street: string;
-    city: string;
-    state: string;
-    country: string;
-    postalCode: string;
-  };
+  addresses?: {
+  name: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+}[];
   isActive: boolean;
   isEmailVerified: boolean;
   tokens: {
@@ -46,13 +49,18 @@ const userSchema = new Schema<IUser>(
     phoneNumber: { type: String, },
     role: { type: String, enum: ['User', 'Admin', 'Vendor'], default: 'User' },
     profilePicture: { type: String },
-    address: {
-      street: { type: String },
-      city: { type: String },
-      state: { type: String },
-      country: { type: String },
-      postalCode: { type: String },
-    },
+      addresses: [
+    {
+      name: { type: String, required: true },
+      phone: { type: String, required: true },
+      addressLine1: { type: String, required: true },
+      addressLine2: { type: String },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      country: { type: String, required: true },
+      postalCode: { type: String, required: true },
+    }
+  ],
     isActive: { type: Boolean, default: true },
     isEmailVerified: { type: Boolean, default: false },
     tokens: {
