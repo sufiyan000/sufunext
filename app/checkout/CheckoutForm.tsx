@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import api from '@/app/lib/axiosClient';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/redux/store';
 import { message } from 'antd';
-
+import { useDispatch } from 'react-redux';
+import { clearCart } from '@/app/redux/features/cartSlice'; 
 interface CartItem {
   productId: string;
   name: string;
@@ -33,31 +34,83 @@ interface CheckoutFormProps {
 }
 
 export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) {
-  const { accessToken } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const { accessToken, user  } = useSelector((state: RootState) => state.auth);
   const [messageApi, contextHolder] = message.useMessage();
-  const [form, setForm] = useState<FormState>({
-    name: '', phone: '', addressLine1: '', addressLine2: '', city: '', state: '', country: '', postalCode: '', paymentMethod: 'COD'
-  });
-  const [items, setItems] = useState<CartItem[]>(cart.items || []);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [e.target.name]: e.target.value });
-  const increment = (index: number) => setItems(prev => prev.map((item, i) => i === index ? { ...item, quantity: item.quantity + 1 } : item));
-  const decrement = (index: number) => setItems(prev => prev.map((item, i) => i === index && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item));
+  const [items, setItems] = useState<CartItem[]>(cart.items || []);
+  const [savedAddresses, setSavedAddresses] = useState<FormState[]>([]);
+  const [useNewAddress, setUseNewAddress] = useState(true);
+
+  const [form, setForm] = useState<FormState>({
+    name: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    country: '',
+    postalCode: '',
+    paymentMethod: 'COD'
+  });
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const res = await api.get('/api/user/addresses'); // ✅ Cookie-based auth
+        const addresses = res.data.addresses || [];
+        setSavedAddresses(addresses);
+        if (addresses.length > 0) {
+          setUseNewAddress(false);
+          setForm({ ...addresses[0], paymentMethod: 'COD' });
+        }
+      } catch (err) {
+        console.error('Failed to fetch addresses:', err);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const increment = (index: number) =>
+    setItems(prev => prev.map((item, i) => i === index ? { ...item, quantity: item.quantity + 1 } : item));
+
+  const decrement = (index: number) =>
+    setItems(prev => prev.map((item, i) => i === index && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const totalCost = items.reduce((acc, item) => acc + item.quantity * item.salePrice, 0);
+
     const orderPayload = {
-      orderItems: items.map(item => ({ ...item, total: item.quantity * item.salePrice })),
-      shippingAddress: { ...form },
-      paymentMethod: form.paymentMethod,
-      shippingCost: 0,
-      totalCost,
-      status: 'Pending' as const,
-    };
-  
+  user: user?._id,  // ✅ Add this line
+  orderItems: items.map(item => ({
+    ...item,
+    total: item.quantity * item.salePrice,
+  })),
+  shippingAddress: { ...form },
+  paymentMethod: form.paymentMethod,
+  shippingCost: 0,
+  totalCost,
+  status: 'Pending' as const,
+};
+
     try {
-      await api.post('/api/orders', orderPayload, { headers: { Authorization: `Bearer ${accessToken}` } });
+      if (useNewAddress) {
+        await api.post('/api/user/addresses', form); // ✅ Cookie-based
+      }
+
+      await api.post('/api/orders', orderPayload); // ✅ Cookie-based
+      // ✅ Clear database cart also
+await api.delete('/api/cart');
+
+// ✅ Clear Redux cart
+dispatch(clearCart());
+
       messageApi.success('Order placed successfully');
       if (onCartUpdate) onCartUpdate([]);
       setItems([]);
@@ -71,16 +124,93 @@ export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto p-4">
       {contextHolder}
+
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
         <h2 className="text-2xl font-bold">Billing Details</h2>
-        <input className="w-full border p-2 rounded" type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-        <input className="w-full border p-2 rounded" type="text" name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} required />
-        <input className="w-full border p-2 rounded" type="text" name="addressLine1" placeholder="Address Line 1" value={form.addressLine1} onChange={handleChange} required />
-        <input className="w-full border p-2 rounded" type="text" name="addressLine2" placeholder="Address Line 2" value={form.addressLine2} onChange={handleChange} />
-        <input className="w-full border p-2 rounded" type="text" name="city" placeholder="City" value={form.city} onChange={handleChange} required />
-        <input className="w-full border p-2 rounded" type="text" name="state" placeholder="State" value={form.state} onChange={handleChange} required />
-        <input className="w-full border p-2 rounded" type="text" name="country" placeholder="Country" value={form.country} onChange={handleChange} required />
-        <input className="w-full border p-2 rounded" type="text" name="postalCode" placeholder="Postal Code" value={form.postalCode} onChange={handleChange} required />
+
+       {savedAddresses.length > 0 && !useNewAddress && (
+  <div className="space-y-4">
+    <h3 className="font-semibold">Select Shipping Address:</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {savedAddresses.map((addr, index) => {
+        const isSelected =
+          addr.addressLine1 === form.addressLine1 &&
+          addr.city === form.city &&
+          addr.postalCode === form.postalCode;
+
+        return (
+          <label
+            key={index}
+            className={`block border p-4 rounded cursor-pointer ${
+              isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+            }`}
+          >
+            <input
+              type="radio"
+              name="selectedAddress"
+              value={index}
+              checked={isSelected}
+              onChange={() => setForm({ ...addr, paymentMethod: 'COD' })}
+              className="mr-2"
+            />
+            <div>
+              <p className="font-semibold">{addr.name}</p>
+              <p>{addr.phone}</p>
+              <p>{addr.addressLine1}</p>
+              {addr.addressLine2 && <p>{addr.addressLine2}</p>}
+              <p>{addr.city}, {addr.state}, {addr.country} - {addr.postalCode}</p>
+            </div>
+          </label>
+        );
+      })}
+    </div>
+
+    <button
+      type="button"
+      className="mt-4 text-blue-600 underline"
+      onClick={() => {
+        setUseNewAddress(true);
+        setForm({
+          name: '',
+          phone: '',
+          addressLine1: '',
+          addressLine2: '',
+          city: '',
+          state: '',
+          country: '',
+          postalCode: '',
+          paymentMethod: 'COD',
+        });
+      }}
+    >
+      + Add New Address
+    </button>
+  </div>
+)}
+
+        {(useNewAddress || savedAddresses.length === 0) && (
+          <>
+            <input className="w-full border p-2 rounded" type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
+            <input className="w-full border p-2 rounded" type="text" name="phone" placeholder="Phone" value={form.phone} onChange={handleChange} required />
+            <input className="w-full border p-2 rounded" type="text" name="addressLine1" placeholder="Address Line 1" value={form.addressLine1} onChange={handleChange} required />
+            <input className="w-full border p-2 rounded" type="text" name="addressLine2" placeholder="Address Line 2" value={form.addressLine2} onChange={handleChange} />
+            <input className="w-full border p-2 rounded" type="text" name="city" placeholder="City" value={form.city} onChange={handleChange} required />
+            <input className="w-full border p-2 rounded" type="text" name="state" placeholder="State" value={form.state} onChange={handleChange} required />
+            <input className="w-full border p-2 rounded" type="text" name="country" placeholder="Country" value={form.country} onChange={handleChange} required />
+            <input className="w-full border p-2 rounded" type="text" name="postalCode" placeholder="Postal Code" value={form.postalCode} onChange={handleChange} required />
+
+            {savedAddresses.length > 0 && (
+              <button
+                type="button"
+                className="text-blue-600 underline"
+                onClick={() => setUseNewAddress(false)}
+              >
+                ← Use Existing Address
+              </button>
+            )}
+          </>
+        )}
+
         <select className="w-full border p-2 rounded" name="paymentMethod" value={form.paymentMethod} onChange={handleChange}>
           <option value="COD">Cash on Delivery</option>
           <option value="CreditCard">Credit Card</option>
@@ -88,6 +218,7 @@ export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) 
           <option value="UPI">UPI</option>
           <option value="PayPal">PayPal</option>
         </select>
+
         <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded">Place Order</button>
       </form>
 
@@ -108,7 +239,9 @@ export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) 
             </div>
           </div>
         ))}
-        <div className="text-right font-bold text-xl border-t pt-4">Total: ₹{items.reduce((acc, item) => acc + item.quantity * item.salePrice, 0)}</div>
+        <div className="text-right font-bold text-xl border-t pt-4">
+          Total: ₹{items.reduce((acc, item) => acc + item.quantity * item.salePrice, 0)}
+        </div>
       </div>
     </div>
   );

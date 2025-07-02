@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }));
 
     const newOrder = new Order({
-      customerId: auth.payload.userId,
+      user: auth.payload.userId, // ✅ Fix here
       orderItems,
       shippingAddress: data.shippingAddress,
       paymentMethod: data.paymentMethod,

@@ -2,18 +2,18 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // TypeScript Interface for Order Items
 interface IOrderItem {
-  productId: mongoose.Types.ObjectId; // Reference to Product
-  name: string; // Name of the product at the time of purchase
-  quantity: number; // Quantity ordered
-  price: number; // Selling price at the time of order
-  total: number; // Total for this item (quantity * price)
-  attributes?: { [key: string]: string | number | boolean }; // Dynamic attributes (e.g., Size: "M", Color: "Red")
+  productId: mongoose.Types.ObjectId;
+  name: string;
+  quantity: number;
+  price: number;
+  total: number;
+  attributes?: { [key: string]: string | number | boolean };
 }
 
 // TypeScript Interface for Order
 export interface IOrder extends Document {
-  customerId: mongoose.Types.ObjectId; // Reference to the Customer placing the order
-  orderItems: IOrderItem[]; // Array of ordered items
+  user: mongoose.Types.ObjectId; // ✅ Changed from customerId to user
+  orderItems: IOrderItem[];
   shippingAddress: {
     name: string;
     phone: string;
@@ -34,13 +34,13 @@ export interface IOrder extends Document {
     country: string;
     postalCode: string;
   };
-  paymentMethod: 'COD' | 'CreditCard' | 'DebitCard' | 'UPI' | 'PayPal'; // Available payment methods
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Returned'; // Order status
-  shippingCost: number; // Cost of shipping
-  totalCost: number; // Grand total (items + shipping - discounts)
+  paymentMethod: 'COD' | 'CreditCard' | 'DebitCard' | 'UPI' | 'PayPal';
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Returned';
+  shippingCost: number;
+  totalCost: number;
   discount?: {
-    code: string; // Discount or coupon code applied
-    amount: number; // Discount value
+    code: string;
+    amount: number;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -49,7 +49,7 @@ export interface IOrder extends Document {
 // Order Schema
 const orderSchema = new Schema<IOrder>(
   {
-    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     orderItems: [
       {
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -57,7 +57,7 @@ const orderSchema = new Schema<IOrder>(
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
         total: { type: Number, required: true },
-        attributes: { type: Map, of: Schema.Types.Mixed }, // Dynamic attribute support
+        attributes: { type: Map, of: Schema.Types.Mixed },
       },
     ],
     shippingAddress: {
@@ -80,7 +80,11 @@ const orderSchema = new Schema<IOrder>(
       country: { type: String },
       postalCode: { type: String },
     },
-    paymentMethod: { type: String, enum: ['COD', 'CreditCard', 'DebitCard', 'UPI', 'PayPal'], required: true },
+    paymentMethod: {
+      type: String,
+      enum: ['COD', 'CreditCard', 'DebitCard', 'UPI', 'PayPal'],
+      required: true,
+    },
     status: {
       type: String,
       enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
@@ -94,7 +98,7 @@ const orderSchema = new Schema<IOrder>(
     },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 

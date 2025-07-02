@@ -61,3 +61,23 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ message: 'Cart item updated', cart });
 }
+
+
+export async function DELETE(req: NextRequest) {
+  await connectMongo();
+
+  const { error, response, payload } = await requireAuth(req);
+  if (error) return response;
+
+  const userId = payload?.userId;
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    return NextResponse.json({ message: 'No cart found' }, { status: 404 });
+  }
+
+  cart.items = [];
+  await cart.save();
+
+  return NextResponse.json({ message: 'Cart cleared successfully' });
+}

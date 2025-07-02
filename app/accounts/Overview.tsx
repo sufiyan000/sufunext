@@ -13,7 +13,6 @@ export default function Overview() {
       <h1 className="text-xl font-bold mb-2">Welcome, {user.firstName}!</h1>
       <p><strong>Email:</strong> {user.email}</p>
       <p><strong>Phone:</strong> {user.phoneNumber || 'N/A'}</p>
-      <p><strong>Role:</strong> {user.role}</p>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
     const userId = payload!.userId; // ✅ Safe non-null assertion
 
-    const orders = await Order.find({ customerId: userId }).sort({ createdAt: -1 });
+    const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
 
     return NextResponse.json({ orders });
   } catch (err) {
