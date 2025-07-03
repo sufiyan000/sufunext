@@ -193,7 +193,7 @@ const handleAddToCart = async () => {
            Order on Whatspp
           </button>
         <Link
-            href="/"
+            href={`/checkout?buyNow=1&id=${product.id}`}
             className={`${lusitana.className} flex justify-center gap-5 self-start rounded-lg bg-[#07f0f0] px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-blue-400 md:text-base`}
           >
            Buy Now

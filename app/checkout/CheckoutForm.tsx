@@ -7,6 +7,7 @@ import { RootState } from '@/app/redux/store';
 import { message } from 'antd';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '@/app/redux/features/cartSlice'; 
+import { useSearchParams } from 'next/navigation';
 interface CartItem {
   productId: string;
   name: string;
@@ -53,6 +54,34 @@ export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) 
     postalCode: '',
     paymentMethod: 'COD'
   });
+  const searchParams = useSearchParams();
+const isBuyNow = searchParams.get('buyNow') === '1';
+const buyNowProductId = searchParams.get('id');
+
+useEffect(() => {
+  const init = async () => {
+    if (isBuyNow && buyNowProductId) {
+      try {
+        const res = await api.get(`/api/products/id/${buyNowProductId}`);
+        const product = res.data;
+        setItems([
+          {
+            productId: product._id,
+            name: product.name,
+            salePrice: product.sellingPrice,
+            quantity: 1,
+            thumbnailUrl: product.thumbnailUrl,
+          }
+        ]);
+      } catch (err) {
+        messageApi.error('Failed to load product for Buy Now');
+      }
+    } else {
+      setItems(cart.items || []);
+    }
+  };
+  init();
+}, [cart.items]);
 
   useEffect(() => {
     const fetchAddresses = async () => {
