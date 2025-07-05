@@ -1,5 +1,5 @@
 import Pagination from '@/app/ui/dashboard/invoices/pagination';
-import Search from '@/app/ui/search';
+import Search from '@/app/ui/front-end/adminSearch';
 import Table from '@/app/ui/dashboard/products/table';
 import { CreateProduct } from '@/app/ui/dashboard/products/buttons';
 import { lusitana } from '@/app/ui/fonts';
