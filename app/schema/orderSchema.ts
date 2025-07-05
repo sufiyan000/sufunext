@@ -12,9 +12,10 @@ interface IOrderItem {
 
 // TypeScript Interface for Order
 export interface IOrder extends Document {
-  user: mongoose.Types.ObjectId; // ✅ Changed from customerId to user
+  user: mongoose.Types.ObjectId;
   orderItems: IOrderItem[];
-  shippingAddress: {
+  deliveryMode: 'HomeDelivery' | 'Pickup'; // ✅ Added field
+  shippingAddress?: {
     name: string;
     phone: string;
     addressLine1: string;
@@ -46,10 +47,18 @@ export interface IOrder extends Document {
   updatedAt: Date;
 }
 
-// Order Schema
+// Mongoose Schema
 const orderSchema = new Schema<IOrder>(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+    deliveryMode: {
+      type: String,
+      enum: ['HomeDelivery', 'Pickup'],
+      default: 'HomeDelivery',
+      required: true,
+    }, // ✅ New field added
+
     orderItems: [
       {
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
@@ -60,16 +69,18 @@ const orderSchema = new Schema<IOrder>(
         attributes: { type: Map, of: Schema.Types.Mixed },
       },
     ],
+
     shippingAddress: {
-      name: { type: String, required: true },
-      phone: { type: String, required: true },
-      addressLine1: { type: String, required: true },
+      name: { type: String },
+      phone: { type: String },
+      addressLine1: { type: String },
       addressLine2: { type: String },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      country: { type: String, required: true },
-      postalCode: { type: String, required: true },
+      city: { type: String },
+      state: { type: String },
+      country: { type: String },
+      postalCode: { type: String },
     },
+
     billingAddress: {
       name: { type: String },
       phone: { type: String },
@@ -80,18 +91,22 @@ const orderSchema = new Schema<IOrder>(
       country: { type: String },
       postalCode: { type: String },
     },
+
     paymentMethod: {
       type: String,
       enum: ['COD', 'CreditCard', 'DebitCard', 'UPI', 'PayPal'],
       required: true,
     },
+
     status: {
       type: String,
       enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
       default: 'Pending',
     },
+
     shippingCost: { type: Number, required: true },
     totalCost: { type: Number, required: true },
+
     discount: {
       code: { type: String },
       amount: { type: Number, default: 0 },
@@ -103,6 +118,7 @@ const orderSchema = new Schema<IOrder>(
 );
 
 // Define and export the Order model
-const Order: Model<IOrder> = mongoose.models.Order || mongoose.model<IOrder>('Order', orderSchema);
+const Order: Model<IOrder> =
+  mongoose.models.Order || mongoose.model<IOrder>('Order', orderSchema);
 
 export default Order;

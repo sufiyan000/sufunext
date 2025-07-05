@@ -1,24 +1,20 @@
+// app/checkout/page.tsx
 import CheckoutForm from "./CheckoutForm";
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { protectServerRoute } from '@/app/lib/protectServerRoute';
 
 export default async function CheckoutPage() {
-  const cookieStore = cookies();
-  const token = cookieStore.get('accessToken');
+  // ✅ Auth check on server
+  const { token, payload } = protectServerRoute(); // optional: you can use payload.userId if needed
 
-  if (!token) {
-    redirect('/login');
-  }
-
+  // ✅ Fetch cart using token
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cart`, {
-  cache: 'no-store',
-  headers: {
-    Cookie: `accessToken=${token.value}`,
-  },
-});
+    cache: 'no-store',
+    headers: {
+      Cookie: `accessToken=${token}`,
+    },
+  });
 
   const cartData = await res.json();
-
   const items = cartData?.cart || [];
 
   return (

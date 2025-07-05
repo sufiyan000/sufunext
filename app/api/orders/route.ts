@@ -11,19 +11,43 @@ export async function POST(req: NextRequest) {
     await connectMongo();
     const data = await req.json();
 
+    const deliveryMode = data.deliveryMode;
+    if (!['Pickup', 'HomeDelivery'].includes(deliveryMode)) {
+      return NextResponse.json({ message: 'Invalid delivery mode' }, { status: 400 });
+    }
+
+    if (!Array.isArray(data.orderItems) || data.orderItems.length === 0) {
+      return NextResponse.json({ message: 'No order items provided' }, { status: 400 });
+    }
+
+    if (deliveryMode === 'HomeDelivery') {
+      const requiredFields = ['name', 'phone', 'addressLine1', 'city', 'state', 'country', 'postalCode'];
+      const missingFields = requiredFields.filter(field => !data.shippingAddress?.[field]);
+      if (missingFields.length > 0) {
+        return NextResponse.json({ message: `Missing address fields: ${missingFields.join(', ')}` }, { status: 400 });
+      }
+    }
+
+    // ✅ YAHAN KARNA HAI YE CHANGE:
+    const shippingAddress =
+      deliveryMode === 'HomeDelivery' && Object.keys(data.shippingAddress || {}).length > 0
+        ? data.shippingAddress
+        : undefined;
+
     const orderItems = data.orderItems.map((item: any) => ({
       productId: item.productId,
       name: item.name,
       quantity: item.quantity,
-      price: item.salePrice, // use salePrice directly as price
+      price: item.salePrice,
       total: item.quantity * item.salePrice,
       attributes: item.attributes || {},
     }));
 
     const newOrder = new Order({
-      user: auth.payload.userId, // ✅ Fix here
+      user: auth.payload.userId,
+      deliveryMode,
       orderItems,
-      shippingAddress: data.shippingAddress,
+      shippingAddress, // 👈 yahi new variable use ho raha
       paymentMethod: data.paymentMethod,
       shippingCost: data.shippingCost || 0,
       totalCost: data.totalCost,
@@ -31,6 +55,7 @@ export async function POST(req: NextRequest) {
     });
 
     await newOrder.save();
+
     return NextResponse.json({ message: 'Order placed successfully' }, { status: 201 });
   } catch (err) {
     console.error('Order creation error:', err);

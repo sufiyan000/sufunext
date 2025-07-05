@@ -104,7 +104,7 @@ const Header = () => {
       </div>
 
       {/* Search Bar Row */}
-      <div className="w-full px-4 mt-2 md:mt-0 md:w-auto">
+      <div className="w-full px-4 mt-2 md:mt-0 md:w-auto p-2">
   <Search placeholder="Search products..." />
 </div>
 
