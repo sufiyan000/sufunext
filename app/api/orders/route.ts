@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
     const orderItems = data.orderItems.map((item: any) => ({
       productId: item.productId,
       name: item.name,
+      thumbnailUrl: item.thumbnailUrl,
       quantity: item.quantity,
       price: item.salePrice,
       total: item.quantity * item.salePrice,

@@ -31,6 +31,7 @@ export default function OrderDetailPage() {
       setUpdating(true);
       const res = await api.patch(`/api/admin/orders/${id}`, { status: newStatus });
       setOrder(res.data.order);
+
       message.success('Order status updated!');
     } catch (err) {
       message.error('Failed to update order status');
@@ -57,25 +58,55 @@ export default function OrderDetailPage() {
 
       {/* Shipping Address */}
       <div className="border p-4 rounded shadow">
-        <h2 className="font-semibold mb-2">Shipping Address</h2>
-        <p>{order.shippingAddress.name}</p>
-        <p>{order.shippingAddress.addressLine1}, {order.shippingAddress.city}</p>
-        <p>{order.shippingAddress.state}, {order.shippingAddress.country} - {order.shippingAddress.postalCode}</p>
-        <p>Phone: {order.shippingAddress.phone}</p>
-      </div>
+          <h2 className="font-semibold mb-2">Shipping Address</h2>
+
+          {order.shippingAddress ? (
+            <>
+              <p>{order.shippingAddress.name}</p>
+              <p>{order.shippingAddress.addressLine1}, {order.shippingAddress.city}</p>
+              <p>{order.shippingAddress.state}, {order.shippingAddress.country} - {order.shippingAddress.postalCode}</p>
+              <p>Phone: {order.shippingAddress.phone}</p>
+            </>
+          ) : (
+            <p className="text-red-500">Shipping address उपलब्ध नहीं है (Pickup ऑर्डर)</p>
+          )}
+        </div>
 
       {/* Items */}
-      <div className="border p-4 rounded shadow">
-        <h2 className="font-semibold mb-2">Items</h2>
-        <ul className="space-y-2">
-          {order.orderItems.map((item: any, i: number) => (
-            <li key={i} className="flex justify-between border-b pb-2">
-              <span>{item.name} x {item.quantity}</span>
-              <span>₹{item.total}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Items with Images */}
+<div className="border p-4 rounded shadow">
+  <h2 className="font-semibold mb-2">Items</h2>
+  <ul className="space-y-4">
+    {order.orderItems.map((item: any, i: number) => (
+      <li key={i} className="flex items-center justify-between gap-4 border-b pb-3">
+        <div className="flex items-center gap-4">
+          {/* 👇 Product Image */}
+          {item.thumbnailUrl ? (
+            <img
+              src={item.thumbnailUrl}
+              alt={item.name}
+              className="w-16 h-16 object-cover rounded border"
+            />
+          ) : (
+            <div className="w-16 h-16 bg-gray-200 flex items-center justify-center text-sm text-gray-500 rounded">
+              No Image
+            </div>
+          )}
+
+          <div>
+            <p className="font-medium">{item.name}</p>
+            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <p className="text-base font-semibold">₹{item.total}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
 
       {/* Payment & Status */}
       <div className="border p-4 rounded shadow space-y-2">

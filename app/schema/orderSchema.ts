@@ -4,6 +4,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 interface IOrderItem {
   productId: mongoose.Types.ObjectId;
   name: string;
+  thumbnailUrl: string;
   quantity: number;
   price: number;
   total: number;
@@ -63,6 +64,7 @@ const orderSchema = new Schema<IOrder>(
       {
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
         name: { type: String, required: true },
+        thumbnailUrl: { type: String, required: true },
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
         total: { type: Number, required: true },

@@ -69,10 +69,10 @@ export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) 
           const product = res.data;
           setItems([{
             productId: product._id,
+            thumbnailUrl: product.thumbnailUrl,
             name: product.name,
             salePrice: product.sellingPrice,
             quantity: 1,
-            thumbnailUrl: product.thumbnailUrl,
           }]);
         } catch (err) {
           messageApi.error('Failed to load product for Buy Now');
