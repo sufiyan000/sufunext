@@ -13,19 +13,24 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const res = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
         const { accessToken, user } = res.data;
+        
+        // ✅ Update Redux store with new token
         store.dispatch(loginSuccess({ accessToken, user }));
-        originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
-        return api(originalRequest);
+
+        // ❌ No need to set header, backend uses cookie
+        return api(originalRequest); // Retry original request
       } catch (refreshError) {
         store.dispatch(logout());
         return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );

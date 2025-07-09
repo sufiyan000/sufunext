@@ -79,10 +79,10 @@ export default async function Page(
       <div>
           <SubLevelShowcase sublevels={sublevels} titleData="Mobile Accessories" />
       </div>
-      <div>
+      {/* <div>
         <CategoryShowcase categories={categories} />
-      </div>
-       {/* <div className="flex justify-center">
+      </div> */}
+       <div className="flex justify-center">
         
        <p className={`${lusitana.className} text-center text-xl text-gray-800 md:text-3xl md:leading-normal`}>
            All Products
@@ -92,7 +92,7 @@ export default async function Page(
          <Productshow query={query} currentPage={currentPage} />
           <div className="mt-5 flex w-full justify-center mb-4">
               <Pagination totalPages={totalPages} />
-            </div> */}
+            </div>
             <Footer />
       </>
 
