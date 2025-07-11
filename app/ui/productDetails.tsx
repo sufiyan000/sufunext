@@ -50,40 +50,37 @@ const { accessToken } = useSelector((state: RootState) => state.auth);
   };
 const handleAddToCart = async () => {
   try {
-    if (accessToken) {
-      // Logged in user
-    await api.post('/api/cart', {
-      productId: product.id,
-      name: product.name,
-      salePrice: product.salePrice,
-      thumbnailUrl: product.thumbnailUrl,
-      quantity: 1,
-    }, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    } else {
-      // Guest user
-      const guestId = localStorage.getItem('guestId') || crypto.randomUUID();
-      localStorage.setItem('guestId', guestId);
-      await api.post('/api/guest-cart', {
+    if (!accessToken) {
+      messageApi.warning('Please login to add product to cart.');
+      window.location.href = '/login'; // Or use router.push('/login') if using next/navigation
+      return;
+    }
+
+    await api.post(
+      '/api/cart',
+      {
         productId: product.id,
         name: product.name,
         salePrice: product.salePrice,
         thumbnailUrl: product.thumbnailUrl,
         quantity: 1,
-        guestId,
-      });
-    }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
-    dispatch(addToCart({
-      productId: product.id,
-      name: product.name,
-      price: product.salePrice,
-      quantity: 1,
-      thumbnailUrl: product.thumbnailUrl,
-    }));
+    dispatch(
+      addToCart({
+        productId: product.id,
+        name: product.name,
+        price: product.salePrice,
+        quantity: 1,
+        thumbnailUrl: product.thumbnailUrl,
+      })
+    );
 
     messageApi.success('Product added to cart!');
   } catch (error) {
@@ -91,6 +88,7 @@ const handleAddToCart = async () => {
     messageApi.error('Failed to add to cart');
   }
 };
+
 
 
 

@@ -35,6 +35,7 @@ interface CheckoutFormProps {
 }
 
 export default function CheckoutForm({ cart, onCartUpdate }: CheckoutFormProps) {
+  const reduxCart = useSelector((state: RootState) => state.cart);
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
   const [messageApi, contextHolder] = message.useMessage();

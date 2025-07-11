@@ -2,9 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectMongo from '@/app/lib/mongodb';
 import Invoice from '@/app/schema/invoiceSchema';
-
-import { v4 as uuidv4 } from 'uuid';
-
 function generateInvoiceNumber() {
   return 'INV-' + Date.now(); // or use uuidv4()
 }

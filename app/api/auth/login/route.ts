@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       path: '/',
     };
 
-    cookies().set('accessToken', accessToken, { ...cookieOptions, maxAge: 60 * 15 });
+    cookies().set('accessToken', accessToken, { ...cookieOptions, maxAge: 30 });
     cookies().set('refreshToken', refreshToken, { ...cookieOptions, maxAge: 60 * 60 * 24 * 7 });
 
     return NextResponse.json({

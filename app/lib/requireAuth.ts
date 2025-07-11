@@ -2,16 +2,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAccessToken } from '@/app/lib/jwt';
 
-export async function requireAuth(req: NextRequest) {
-  const token = req.cookies.get('accessToken')?.value;
-  if (!token) {
-    return { error: true, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-  }
+interface AuthPayload {
+  userId: string;
+  role: 'User' | 'Admin'; // Update if you have more roles
+  email: string;
+}
 
-  const payload = verifyAccessToken(token);
-  if (!payload) {
-    return { error: true, response: NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 }) };
-  }
+interface AuthResult {
+  error: boolean;
+  payload?: AuthPayload;
+  response?: NextResponse;
+}
 
-  return { error: false, payload };
+export async function requireAuth(req: NextRequest): Promise<AuthResult> {
+  try {
+    const token = req.cookies.get('accessToken')?.value;
+
+    if (!token) {
+      return {
+        error: true,
+        response: NextResponse.json({ message: 'Unauthorized: No access token' }, { status: 401 }),
+      };
+    }
+
+    const payload = verifyAccessToken(token) as AuthPayload;
+
+    if (!payload || !payload.userId) {
+      return {
+        error: true,
+        response: NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 }),
+      };
+    }
+
+    return { error: false, payload };
+  } catch (err) {
+    console.error('Auth error:', err);
+    return {
+      error: true,
+      response: NextResponse.json({ message: 'Unauthorized: Invalid token' }, { status: 401 }),
+    };
+  }
 }
